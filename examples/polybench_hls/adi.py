@@ -69,5 +69,19 @@ def adi(ttype, TSTEPS, N):
     print(code)
 
 
+def test_adi():
+    # read problem size settings
+    setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
+    with open(setting_path, "r") as fp:
+        psize = json.load(fp)
+    # for CI test we use mini problem size
+    test_psize = "mini"
+
+    TSTEPS = psize["adi"][test_psize]["TSTEPS"]
+    N = psize["adi"][test_psize]["N"]
+
+    adi(int32, TSTEPS, N)
+
+
 if __name__ == "__main__":
-    adi()
+    test_adi()

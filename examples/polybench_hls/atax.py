@@ -65,7 +65,7 @@ def test_atax():
     M = psize["atax"][test_psize]["M"]
     N = psize["atax"][test_psize]["N"]
     concrete_type = float32
-    atax(concrete_type, M, N)
+    atax(int32, M, N)
 
 
 if __name__ == "__main__":

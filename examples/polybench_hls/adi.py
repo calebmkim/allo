@@ -7,7 +7,7 @@ import os
 import json
 import numpy as np
 import allo.ir.types as T
-from allo.ir.types import float32, int32, index
+from allo.ir.types import float32, int32, fixed_32_16
 
 
 def adi(ttype, TSTEPS, N):
@@ -80,7 +80,7 @@ def test_adi():
     TSTEPS = psize["adi"][test_psize]["TSTEPS"]
     N = psize["adi"][test_psize]["N"]
 
-    adi(int32, TSTEPS, N)
+    adi(fixed_32_16, TSTEPS, N)
 
 
 if __name__ == "__main__":

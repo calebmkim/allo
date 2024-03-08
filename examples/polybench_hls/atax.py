@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32, float32, Fixed
 import allo.ir.types as T
 
 
@@ -18,23 +18,23 @@ def atax_np(A, x):
 
 def atax(concrete_type, m, n):
     def stage_M[
-        T: (float32, int32), M: int32, N: int32
+        T: (Fixed(32, 16), int32), M: int32, N: int32
     ](A: "T[M, N]", x: "T[N]", out_Ax: "T[M]"):
         for m in allo.grid(M):
             for r in allo.reduction(N):
                 out_Ax[m] += A[m, r] * x[r]
 
     def stage_N[
-        T: (float32, int32), M: int32, N: int32
+        T: (Fixed(32, 16), int32), M: int32, N: int32
     ](A: "T[M, N]", out_Ax: "T[M]", y: "T[N]"):
         for n in allo.grid(N):
             for k in allo.reduction(M):
                 y[n] += A[k, n] * out_Ax[k]
 
     def kernel_atax[
-        T: (float32, int32), M: int32, N: int32
+        T: (Fixed(32, 16), int32), M: int32, N: int32
     ](A: "T[M, N]", x: "T[N]", y: "T[N]"):
-        out_Ax: T[M] = 0
+        out_Ax: T[M] = 0.0
         stage_M[T, M, N](A, x, out_Ax)
         stage_N[T, M, N](A, out_Ax, y)
 
@@ -65,7 +65,7 @@ def test_atax():
     M = psize["atax"][test_psize]["M"]
     N = psize["atax"][test_psize]["N"]
     concrete_type = float32
-    atax(int32, M, N)
+    atax(Fixed(32, 16), M, N)
 
 
 if __name__ == "__main__":

@@ -10,29 +10,23 @@ from allo.ir.types import int32, float32, Fixed
 import allo.ir.types as T
 
 
-def atax_np(A, x):
-    out_Ax = np.dot(A, x)
-    y = np.dot(A.T, out_Ax)
-    return y
-
-
 def atax(concrete_type, m, n):
     def stage_M[
-        T: (Fixed(32, 16), int32), M: int32, N: int32
+        T: (concrete_type, int32), M: int32, N: int32
     ](A: "T[M, N]", x: "T[N]", out_Ax: "T[M]"):
         for m in allo.grid(M):
             for r in allo.reduction(N):
                 out_Ax[m] += A[m, r] * x[r]
 
     def stage_N[
-        T: (Fixed(32, 16), int32), M: int32, N: int32
+        T: (concrete_type, int32), M: int32, N: int32
     ](A: "T[M, N]", out_Ax: "T[M]", y: "T[N]"):
         for n in allo.grid(N):
             for k in allo.reduction(M):
                 y[n] += A[k, n] * out_Ax[k]
 
     def kernel_atax[
-        T: (Fixed(32, 16), int32), M: int32, N: int32
+        T: (concrete_type, int32), M: int32, N: int32
     ](A: "T[M, N]", x: "T[N]", y: "T[N]"):
         out_Ax: T[M] = 0.0
         stage_M[T, M, N](A, x, out_Ax)
@@ -65,7 +59,7 @@ def test_atax():
     M = psize["atax"][test_psize]["M"]
     N = psize["atax"][test_psize]["N"]
     concrete_type = Fixed(32, 16)
-    atax(Fixed(32, 16), M, N)
+    atax(concrete_type, M, N)
 
 
 if __name__ == "__main__":

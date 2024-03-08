@@ -10,6 +10,12 @@ from allo.ir.types import int32, float32
 import allo.ir.types as T
 
 
+def atax_np(A, x):
+    out_Ax = np.dot(A, x)
+    y = np.dot(A.T, out_Ax)
+    return y
+
+
 def atax(concrete_type, m, n):
     def stage_M[
         T: (float32, int32), M: int32, N: int32
@@ -46,9 +52,21 @@ def atax(concrete_type, m, n):
     sch.compose(sch0)
     sch.compose(sch1)
 
-    code = sch.build(target="vhls")
-    print(code)
+    print(sch.build(target="vhls"))
+
+
+def test_atax():
+    # read problem size settings
+    setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
+    with open(setting_path, "r") as fp:
+        psize = json.load(fp)
+    # for CI test we use small problem size
+    test_psize = "small"
+    M = psize["atax"][test_psize]["M"]
+    N = psize["atax"][test_psize]["N"]
+    concrete_type = float32
+    atax(concrete_type, M, N)
 
 
 if __name__ == "__main__":
-    atax()
+    test_atax()

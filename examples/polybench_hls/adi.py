@@ -7,7 +7,7 @@ import os
 import json
 import numpy as np
 import allo.ir.types as T
-from allo.ir.types import float32, int32, fixed_32_16
+from allo.ir.types import float32, int32, index, fixed_32_16
 
 
 def adi(ttype, TSTEPS, N):

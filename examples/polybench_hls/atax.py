@@ -64,7 +64,7 @@ def test_atax():
     test_psize = "small"
     M = psize["atax"][test_psize]["M"]
     N = psize["atax"][test_psize]["N"]
-    concrete_type = float32
+    concrete_type = Fixed(32, 16)
     atax(Fixed(32, 16), M, N)
 
 

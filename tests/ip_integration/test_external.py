@@ -6,6 +6,7 @@ import pytest
 import numpy as np
 import allo
 from allo.ir.types import int32, float32
+import allo.backend.hls as hls
 
 
 def test_pybind11():
@@ -21,6 +22,22 @@ def test_pybind11():
     c = np.zeros((16, 16)).astype(np.float32)
     mod(a, b, c)
     np.testing.assert_allclose(np.matmul(a, b), c, atol=1e-6)
+    print("Passed!")
+
+
+def test_extern_c():
+    vadd = allo.IPModule(
+        top="vadd",
+        headers=["vadd_extern.h"],
+        impls=["vadd_extern.cpp"],
+        signature=["int32[32]", "int32[32]", "int32[32]"],
+        link_hls=False,
+    )
+    np_A = np.random.randint(0, 100, (32,)).astype(np.int32)
+    np_B = np.random.randint(0, 100, (32,)).astype(np.int32)
+    np_C = np.zeros((32,), dtype=np.int32)
+    vadd(np_A, np_B, np_C)
+    np.testing.assert_allclose(np_A + np_B, np_C, atol=1e-6)
     print("Passed!")
 
 
@@ -72,14 +89,14 @@ def test_lib_gemm():
     np.testing.assert_allclose(np.matmul(a, b) + 1, c, atol=1e-6)
     print("Passed!")
 
-    if os.system(f"which vivado_hls >> /dev/null") == 0:
+    if hls.is_available():
         hls_mod = s.build(target="vivado_hls", mode="debug", project="gemm_ext.prj")
         print(hls_mod)
         hls_mod()
     else:
         print("Vivado HLS not found, skipping...")
 
-    if os.system(f"which vitis_hls >> /dev/null") == 0:
+    if hls.is_available("vitis_hls"):
         hls_mod = s.build(
             target="vitis_hls", mode="sw_emu", project="gemm_ext_vitis.prj"
         )
@@ -89,9 +106,7 @@ def test_lib_gemm():
         print("Vitis HLS not found, skipping...")
 
 
-@pytest.mark.skipif(
-    os.system(f"which vivado_hls >> /dev/null") != 0, reason="Vivado HLS not found"
-)
+@pytest.mark.skipif(not hls.is_available(), reason="Vivado HLS not found")
 def test_systolic_stream():
     M, N, K = 2, 2, 2
     sa = allo.IPModule(

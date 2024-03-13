@@ -80,7 +80,7 @@ def test_adi():
     TSTEPS = psize["adi"][test_psize]["TSTEPS"]
     N = psize["adi"][test_psize]["N"]
 
-    adi(int32, TSTEPS, N)
+    adi(Fixed(32, 0), TSTEPS, N)
 
 
 if __name__ == "__main__":

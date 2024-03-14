@@ -36,7 +36,8 @@ def lu(concrete_type, n):
                     A[i, j] -= A[i, k] * A[k, j]
 
     s0 = allo.customize(kernel_lu, instantiate=[concrete_type, n])
-    return s0.build(target="vitis hls")
+    code = s0.build(target="vitis hls")
+    return code
 
 
 def test_lu():
@@ -57,7 +58,7 @@ def test_lu():
 
     # run allo
     A_opt = A.copy()
-    return lu(int32, N)(A_opt)
+    return lu(int32, N)
 
     # verify
     # np.testing.assert_allclose(A_ref, A_opt, rtol=1e-4, atol=1e-4)

@@ -36,7 +36,7 @@ def lu(concrete_type, n):
                     A[i, j] -= A[i, k] * A[k, j]
 
     s0 = allo.customize(kernel_lu, instantiate=[concrete_type, n])
-    code = s0.build(target="vitis hls")
+    code = s0.build(target="vhls")
     print(code)
 
 

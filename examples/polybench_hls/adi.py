@@ -61,13 +61,13 @@ def adi_np(u, v, p, q, TSTEPS, N):
 
 
 def adi(ttype, TSTEPS, N):
-    DX = (int) (1.0 / N)
-    DY = (int) (1.0 / N)
-    DT = (int) (1.0 / TSTEPS)
-    B1 = (int) (2.0)
-    B2 = (int) (1.0)
-    mul1 = (int) (B1 * DT / (DX * DX))
-    mul2 = (int) (B2 * DT / (DY * DY))
+    DX = (1.0 / N)
+    DY = (1.0 / N)
+    DT = (1.0 / TSTEPS)
+    B1 = (2.0)
+    B2 = (1.0)
+    mul1 = (B1 * DT / (DX * DX))
+    mul2 = (B2 * DT / (DY * DY))
 
     a = (int) (-mul1 / 2.0)
     b = (int) (1.0 + mul1)

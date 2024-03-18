@@ -7,7 +7,7 @@ import os
 import json
 import numpy as np
 import allo.ir.types as T
-from allo.ir.types import float32, int32, index
+from allo.ir.types import int32, index
 
 
 def adi_np(u, v, p, q, TSTEPS, N):
@@ -77,7 +77,7 @@ def adi(ttype, TSTEPS, N):
     f = d
 
     def kernel_adi[
-        T: (float32, int32), TSTEPS: int32, N: int32
+        T: (int32, int32), TSTEPS: int32, N: int32
     ](u: "T[N, N]", v: "T[N, N]", p: "T[N, N]", q: "T[N, N]"):
         for t in range(1, TSTEPS + 1):
             for i in range(1, N - 1):
@@ -115,9 +115,6 @@ def adi(ttype, TSTEPS, N):
                     u[i, j] = p[i, j] * u[i, j + 1] + q[i, j]
 
     s = allo.customize(kernel_adi, instantiate=[ttype, TSTEPS, N])
-    mod = s.build()
-    return mod
-
 
 def test_adi():
     # read problem size settings
@@ -142,7 +139,8 @@ def test_adi():
 
     adi_np(u_ref, v_ref, p_ref, q_ref, TSTEPS, N)
 
-    mod = adi(float32, TSTEPS, N)
+    s = adi(int32, TSTEPS, N)
+    mod = s.build()
     mod(u, v, p, q)
 
     np.testing.assert_allclose(u, u_ref, rtol=1e-5, atol=1e-5)
@@ -150,6 +148,26 @@ def test_adi():
     np.testing.assert_allclose(p, p_ref, rtol=1e-5, atol=1e-5)
     np.testing.assert_allclose(q, q_ref, rtol=1e-5, atol=1e-5)
 
+
+def print_adi():
+    """"""
+    setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
+    with open(setting_path, "r") as fp:
+        psize = json.load(fp)
+    # for CI test we use mini problem size
+    test_psize = "mini"
+
+    TSTEPS = psize["adi"][test_psize]["TSTEPS"]
+    N = psize["adi"][test_psize]["N"]
+
+    u = np.random.randint(0, 100, (N, N))
+    v = np.random.randint(0, 100, (N, N))
+    p = np.random.randint(0, 100, (N, N))
+    q = np.random.randint(0, 100, (N, N))
+
+    s = adi(int32, TSTEPS, N)
+    mod = s.build(target="vhls")
+    print(mod)
 
 if __name__ == "__main__":
     pytest.main([__file__])

@@ -23,8 +23,8 @@ def adi_np(u, v, p, q, TSTEPS, N):
     b = int(1 + mul1)
     c = int(a)
     d = int(-mul2 / 2)
-    e = (1 + mul2)
-    f = (d)
+    e = int(1 + mul2)
+    f = int(d)
 
     for t in range(1, TSTEPS + 1):
         for i in range(1, N - 1):
@@ -72,9 +72,9 @@ def adi(ttype, TSTEPS, N):
     a = int(-mul1 / 2)
     b = int(1 + mul1)
     c = int(a)
-    d = -5.5
-    e = (1 + mul2)
-    f = (d)
+    d = int(-mul2 / 2)
+    e = int(1 + mul2)
+    f = int(d)
 
     def kernel_adi[
         T: (int32, int32), TSTEPS: int32, N: int32
@@ -87,8 +87,8 @@ def adi(ttype, TSTEPS, N):
                 for j in range(1, N - 1):
                     p[i, j] = (-c / ((a * p[i, j - 1] + b)))
                     q[i, j] = (
-                        -d * u[j, i - 1]
-                        + (1 + (2 * d)) * u[j, i]
+                        # -d * u[j, i - 1]
+                        (1 + (2 * d)) * u[j, i]
                         - (f * u[j, i + 1]
                         - a * q[i, j - 1]
                     ) / (a * p[i, j - 1] + b))

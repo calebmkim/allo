@@ -48,8 +48,7 @@ def covariance(type, m, n):
             cov[i, j] = covariance // (N - 1)
 
     s = allo.customize(kernel_covariance, instantiate=[type, m, n])
-    mod = s.build()
-    return mod
+    return s
 
 
 def test_covariance():
@@ -72,6 +71,38 @@ def test_covariance():
     np.testing.assert_allclose(mean, mean_ref, rtol=1e-5, atol=1e-5)
     np.testing.assert_allclose(cov, cov_ref, rtol=1e-5, atol=1e-5)
 
+def test_covariance():
+    # read problem size settings
+    setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
+    with open(setting_path, "r") as fp:
+        psize = json.load(fp)
+    # for CI test we use small problem size
+    test_psize = "small"
+    M = psize["covariance"][test_psize]["M"]
+    N = psize["covariance"][test_psize]["N"]
+    s = covariance(int32, M, N)
+    mod = s.build()
+    data = np.random.randint(-10, 10, (N, M)).astype(np.int32)
+    mean = np.zeros((M,), dtype=np.int32)
+    cov = np.zeros((M, M), dtype=np.int32)
+    mean_ref = np.zeros((M,), dtype=np.int32)
+    cov_ref = np.zeros((M, M), dtype=np.int32)
+    covariance_np(data.copy(), mean_ref, cov_ref, M, N)
+    mod(data, mean, cov)
+    np.testing.assert_allclose(mean, mean_ref, rtol=1e-5, atol=1e-5)
+    np.testing.assert_allclose(cov, cov_ref, rtol=1e-5, atol=1e-5)
+
+def print_covariance():
+    setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
+    with open(setting_path, "r") as fp:
+        psize = json.load(fp)
+    # for CI test we use small problem size
+    test_psize = "small"
+    M = psize["covariance"][test_psize]["M"]
+    N = psize["covariance"][test_psize]["N"]
+    s = covariance(int32, M, N)
+    mod = s.build(target="vhls")
+    print(mod)
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    print_covariance()

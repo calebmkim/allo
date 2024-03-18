@@ -69,11 +69,11 @@ def adi(ttype, TSTEPS, N):
     mul1 = (B1 * DT / (DX * DX))
     mul2 = (B2 * DT / (DY * DY))
 
-    a = (-mul1 / 2.0)
-    b = (1.0 + mul1)
+    a = int(-mul1 / 2)
+    b = (1 + mul1)
     c = (a)
-    d = (-mul2 / 2.0)
-    e = (1.0 + mul2)
+    d = (-mul2 / 2)
+    e = (1 + mul2)
     f = (d)
 
     def kernel_adi[

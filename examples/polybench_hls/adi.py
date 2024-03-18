@@ -55,7 +55,7 @@ def adi_np(u, v, p, q, TSTEPS, N):
                     - c * v[i + 1][j]
                     - d * q[i][j - 1]
                 ) / (d * p[i][j - 1] + e))
-            u[i][N - 1] = 1.0
+            u[i][N - 1] = 1
             for j in range(N - 2, 0, -1):
                 u[i][j] = p[i][j] * u[i][j + 1] + q[i][j]
 
@@ -160,11 +160,6 @@ def print_adi():
 
     TSTEPS = psize["adi"][test_psize]["TSTEPS"]
     N = psize["adi"][test_psize]["N"]
-
-    u = np.random.randint(0, 100, (N, N))
-    v = np.random.randint(0, 100, (N, N))
-    p = np.random.randint(0, 100, (N, N))
-    q = np.random.randint(0, 100, (N, N))
 
     s = adi(int32, TSTEPS, N)
     mod = s.build(target="vhls")

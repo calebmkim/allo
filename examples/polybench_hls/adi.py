@@ -171,4 +171,4 @@ def print_adi():
     print(mod)
 
 if __name__ == "__main__":
-    print_adi()
+    pytest.main([__file__])

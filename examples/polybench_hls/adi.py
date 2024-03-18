@@ -61,20 +61,20 @@ def adi_np(u, v, p, q, TSTEPS, N):
 
 
 def adi(ttype, TSTEPS, N):
-    DX = 1.0 / N
-    DY = 1.0 / N
-    DT = 1.0 / TSTEPS
-    B1 = 2.0
-    B2 = 1.0
-    mul1 = B1 * DT / (DX * DX)
-    mul2 = B2 * DT / (DY * DY)
+    DX = (int) (1.0 / N)
+    DY = (int) (1.0 / N)
+    DT = (int) (1.0 / TSTEPS)
+    B1 = (int) (2.0)
+    B2 = (int) (1.0)
+    mul1 = (int) (B1 * DT / (DX * DX))
+    mul2 = (int) (B2 * DT / (DY * DY))
 
-    a = -mul1 / 2.0
-    b = 1.0 + mul1
-    c = a
-    d = -mul2 / 2.0
-    e = 1.0 + mul2
-    f = d
+    a = (int) (-mul1 / 2.0)
+    b = (int) (1.0 + mul1)
+    c = (int) (a)
+    d = (int) (-mul2 / 2.0)
+    e = (int) (1.0 + mul2)
+    f = (int) (d)
 
     def kernel_adi[
         T: (int32, int32), TSTEPS: int32, N: int32

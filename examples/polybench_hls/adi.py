@@ -106,7 +106,7 @@ def adi(ttype, TSTEPS, N):
                         -a * v[i - 1, j]
                         + (1 + 2 * a) * v[i, j]
                         - c * v[i + 1, j]
-                        - d * q[i, j - 1]
+                        # - d * q[i, j - 1]
                     ) / (d * p[i, j - 1] + e))
                 u[i, N - 1] = 1
                 for j_rev in range(N - 1):

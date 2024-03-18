@@ -67,8 +67,8 @@ def test_atax():
     concrete_type = int32
     sch = atax(concrete_type, M, N)
     mod = sch.build()
-    A = np.random.rand(M, N).astype(np.int32)
-    x = np.random.rand(N).astype(np.int32)
+    A = np.random.randint(100, size=(M, N))
+    x = np.random.randint(100, size=N)
     y = np.zeros((N,), dtype=np.int32)
     y_ref = atax_np(A, x)
     mod(A, x, y)

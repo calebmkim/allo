@@ -72,7 +72,7 @@ def adi(ttype, TSTEPS, N):
     a = int(-mul1 / 2)
     b = int(1 + mul1)
     c = int(a)
-    d = int(-mul2 / 2)
+    d = -13
     e = (1 + mul2)
     f = (d)
 
@@ -115,7 +115,6 @@ def adi(ttype, TSTEPS, N):
                     u[i, j] = p[i, j] * u[i, j + 1] + q[i, j]
 
     s = allo.customize(kernel_adi, instantiate=[ttype, TSTEPS, N])
-    print(d)
     return s
 
 def test_adi():

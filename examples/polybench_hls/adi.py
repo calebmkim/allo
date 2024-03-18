@@ -11,20 +11,20 @@ from allo.ir.types import int32, index
 
 
 def adi_np(u, v, p, q, TSTEPS, N):
-    DX = 1.0 / N
-    DY = 1.0 / N
-    DT = 1.0 / TSTEPS
-    B1 = 2.0
-    B2 = 1.0
-    mul1 = B1 * DT / (DX * DX)
-    mul2 = B2 * DT / (DY * DY)
+    DX = (1.0 / N)
+    DY = (1.0 / N)
+    DT = (1.0 / TSTEPS)
+    B1 = (2.0)
+    B2 = (1.0)
+    mul1 = (B1 * DT / (DX * DX))
+    mul2 = (B2 * DT / (DY * DY))
 
-    a = -mul1 / 2.0
-    b = 1.0 + mul1
-    c = a
-    d = -mul2 / 2.0
-    e = 1.0 + mul2
-    f = d
+    a = int(-mul1 / 2)
+    b = int(1 + mul1)
+    c = int(a)
+    d = int(-mul2 / 2)
+    e = int(1 + mul2)
+    f = int(d)
 
     for t in range(1, TSTEPS + 1):
         for i in range(1, N - 1):
@@ -70,11 +70,11 @@ def adi(ttype, TSTEPS, N):
     mul2 = (B2 * DT / (DY * DY))
 
     a = int(-mul1 / 2)
-    b = (1 + mul1)
-    c = (a)
-    d = (-mul2 / 2)
-    e = (1 + mul2)
-    f = (d)
+    b = int(1 + mul1)
+    c = int(a)
+    d = int(-mul2 / 2)
+    e = int(1 + mul2)
+    f = int(d)
 
     def kernel_adi[
         T: (int32, int32), TSTEPS: int32, N: int32

@@ -86,7 +86,7 @@ def adi(ttype, TSTEPS, N):
                 q[i, 0] = v[0, i]
                 for j in range(1, N - 1):
                     p[i, j] = (-c / ((a * p[i, j - 1] + b)))
-                    iv = -d * u[j, (i - 1)]
+                    iv = (-1 * d) * u[j, (i - 1)]
                     q[i, j] = (
                         iv
                         + (1 + (2 * d)) * u[j, i]

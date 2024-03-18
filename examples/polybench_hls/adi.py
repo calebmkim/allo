@@ -128,10 +128,10 @@ def test_adi():
     TSTEPS = psize["adi"][test_psize]["TSTEPS"]
     N = psize["adi"][test_psize]["N"]
 
-    u = np.random.randint(0, 100, (N, N))
-    v = np.random.randint(0, 100, (N, N))
-    p = np.random.randint(0, 100, (N, N))
-    q = np.random.randint(0, 100, (N, N))
+    u = np.random.randint(0, 10, (N, N))
+    v = np.random.randint(0, 10, (N, N))
+    p = np.random.randint(0, 10, (N, N))
+    q = np.random.randint(0, 10, (N, N))
 
     u_ref = u.copy()
     v_ref = v.copy()

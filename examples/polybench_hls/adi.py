@@ -32,8 +32,8 @@ def adi_np(u, v, p, q, TSTEPS, N):
             p[i][0] = 0.0
             q[i][0] = v[0][i]
             for j in range(1, N - 1):
-                p[i][j] = -c / (a * p[i][j - 1] + b)
-                q[i][j] = (
+                p[i][j] = int(-c / (a * p[i][j - 1] + b))
+                q[i][j] = int(
                     -d * u[j][i - 1]
                     + (1.0 + 2.0 * d) * u[j][i]
                     - f * u[j][i + 1]
@@ -48,13 +48,13 @@ def adi_np(u, v, p, q, TSTEPS, N):
             p[i][0] = 0.0
             q[i][0] = u[i][0]
             for j in range(1, N - 1):
-                p[i][j] = -f / (d * p[i][j - 1] + e)
-                q[i][j] = (
+                p[i][j] = int(-f / (d * p[i][j - 1] + e))
+                q[i][j] = int((
                     -a * v[i - 1][j]
                     + (1.0 + 2.0 * a) * v[i][j]
                     - c * v[i + 1][j]
                     - d * q[i][j - 1]
-                ) / (d * p[i][j - 1] + e)
+                ) / (d * p[i][j - 1] + e))
             u[i][N - 1] = 1.0
             for j in range(N - 2, 0, -1):
                 u[i][j] = p[i][j] * u[i][j + 1] + q[i][j]
@@ -85,8 +85,8 @@ def adi(ttype, TSTEPS, N):
                 p[i, 0] = 0
                 q[i, 0] = v[0, i]
                 for j in range(1, N - 1):
-                    p[i, j] = (-c / ((a * p[i, j - 1] + b)))
-                    q[i, j] = (
+                    p[i, j] = int(-c / ((a * p[i, j - 1] + b)))
+                    q[i, j] = int(
                         (1 + (2 * d)) * u[j, i]
                         - (d) * (u[j, (i - 1)])
                         - (f * u[j, i + 1]
@@ -102,8 +102,8 @@ def adi(ttype, TSTEPS, N):
                 p[i, 0] = 0
                 q[i, 0] = u[i, 0]
                 for j in range(1, N - 1):
-                    p[i, j] = (-f / (d * p[i, j - 1] + e))
-                    q[i, j] = ((
+                    p[i, j] = int(-f / (d * p[i, j - 1] + e))
+                    q[i, j] = int((
                         -a * v[i - 1, j]
                         + (1.0 + 2.0 * a) * v[i, j]
                         - c * v[i + 1, j]

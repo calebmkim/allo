@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -20,7 +20,7 @@ def mvt_np(A, x1, x2, y1, y2):
 
 def mvt(concrete_type, N):
     def stageA[
-        T: (float32, int32), N: int32
+        T: (int32, int32), N: int32
     ](x1_in: "T[N]", x1_out: "T[N]", A: "T[N, N]", y1: "T[N]"):
         for i0 in allo.grid(N, name="A"):
             x: T = x1_in[i0]
@@ -29,7 +29,7 @@ def mvt(concrete_type, N):
             x1_out[i0] = x
 
     def stageB[
-        T: (float32, int32), N: int32
+        T: (int32, int32), N: int32
     ](x2_in: "T[N]", x2_out: "T[N]", A: "T[N, N]", y2: "T[N]"):
         for i1 in allo.grid(N, name="B"):
             x: T = x2_in[i1]
@@ -38,7 +38,7 @@ def mvt(concrete_type, N):
             x2_out[i1] = x
 
     def kernel_mvt[
-        T: (float32, int32), N: int32
+        T: (int32, int32), N: int32
     ](
         A: "T[N, N]",
         A_copy: "T[N, N]",
@@ -76,15 +76,15 @@ def test_mvt():
     # for CI test we use small problem size
     test_psize = "small"
     N = psize["mvt"][test_psize]["N"]
-    concrete_type = float32
+    concrete_type = int32
     sch = mvt(concrete_type, N)
     mod = sch.build()
     # functional correctness test
-    A = np.random.rand(N, N).astype(np.float32)
-    x1 = np.random.rand(N).astype(np.float32)
-    x2 = np.random.rand(N).astype(np.float32)
-    y1 = np.zeros(N).astype(np.float32)
-    y2 = np.zeros(N).astype(np.float32)
+    A = np.random.randint(100, size=(N, N))
+    x1 = np.random.randint(100, size=(N,))
+    x2 = np.random.randint(100, size=(N,))
+    y1 = np.zeros(N).astype(np.int32)
+    y2 = np.zeros(N).astype(np.int32)
 
     x1_ref = x1.copy()
     x2_ref = x2.copy()

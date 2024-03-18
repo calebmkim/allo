@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -16,18 +16,18 @@ def trisolv_np(L, x, b):
         x[i] = b[i]
         for j in range(i):
             x[i] -= L[i, j] * x[j]
-        x[i] /= L[i, i]
+        x[i] = int(x[i] / L[i, i])
 
 
 def trisolv(concrete_type, n):
     def kernel_trisolv[
-        T: (float32, int32), N: int32
-    ](L: float32[N, N], b: float32[N], x: float32[N]):
+        T: (int32, int32), N: int32
+    ](L: int32[N, N], b: int32[N], x: int32[N]):
         for i in range(N):
             x[i] = b[i]
             for j in range(i):
                 x[i] -= L[i, j] * x[j]
-            x[i] /= L[i, i]
+            x[i] = int(x[i] / L[i, i])
 
     s0 = allo.customize(kernel_trisolv, instantiate=[concrete_type, n])
     return s0.build()
@@ -43,8 +43,8 @@ def test_trisolv():
 
     # generate input data
     N = psize["trisolv"][test_psize]["N"]
-    L = np.random.rand(N, N).astype(np.float32)
-    b = np.random.rand(N).astype(np.float32)
+    L = np.random.randint(10, size=(N, N))
+    b = np.random.randint(10, size=(N,))
 
     # run reference
     x_ref = np.zeros_like(b)
@@ -52,7 +52,7 @@ def test_trisolv():
 
     # run allo
     x = np.zeros_like(b)
-    s = trisolv(float32, N)
+    s = trisolv(int32, N)
     s(L, b, x)
 
     # verify

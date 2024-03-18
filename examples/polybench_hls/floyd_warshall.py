@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -19,7 +19,7 @@ def floyd_warshall_np(path):
 
 
 def floyd_warshall(concrete_type, N):
-    def kernel_floyd_warshall[T: (float32, int32), N: int32](path: "T[N, N]"):
+    def kernel_floyd_warshall[T: (int32, int32), N: int32](path: "T[N, N]"):
         for k, i, j in allo.grid(N, N, N):
             path_: T = path[i, k] + path[k, j]
             if path[i, j] >= path_:
@@ -37,9 +37,9 @@ def test_floyd_warshall():
     # for CI test we use small problem size
     test_psize = "small"
     N = psize["floyd_warshall"][test_psize]["N"]
-    concrete_type = float32
+    concrete_type = int32
     mod = floyd_warshall(concrete_type, N)
-    path = np.random.rand(N, N).astype(np.float32)
+    path = np.random.randint(1, 10, size=(N,N))
     path_ref = path.copy()
     floyd_warshall_np(path_ref)
     mod(path)

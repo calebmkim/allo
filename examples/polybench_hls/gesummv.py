@@ -6,26 +6,26 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
 def gesummv_np(A, B, x, y, alpha, beta):
     tmp = np.zeros_like(y)
     for i in range(A.shape[0]):
-        tmp[i] = 0.0
-        y[i] = 0.0
+        tmp[i] = 0
+        y[i] = 0
         for j in range(A.shape[1]):
             tmp[i] += A[i, j] * x[j]
             y[i] += B[i, j] * x[j]
         y[i] = alpha * tmp[i] + beta * y[i]
 
 
-def gesummv(concrete_type, N, alpha=0.1, beta=0.1):
+def gesummv(concrete_type, N, alpha=10, beta=10):
     def compute_tmp[
-        T: (float32, int32), N: int32
+        T: (int32, int32), N: int32
     ](y_in: "T[N]", y_out: "T[N]", A: "T[N, N]", B: "T[N, N]", x: "T[N]", tmp: "T[N]"):
-        tt: T[N] = 0.0
+        tt: T[N] = 0
         yy: T[N]
         for i0 in allo.grid(N, name="load"):
             yy[i0] = y_in[i0]
@@ -37,15 +37,15 @@ def gesummv(concrete_type, N, alpha=0.1, beta=0.1):
             y_out[i1] = yy[i1]
 
     def compute_y[
-        T: (float32, int32), N: int32
+        T: (int32, int32), N: int32
     ](y_in: "T[N]", y_out: "T[N]", tmp: "T[N]"):
         for i0 in allo.grid(N, name="load"):
             y_out[i0] = alpha * tmp[i0] + beta * y_in[i0]
 
     def kernel_gesummv[
-        T: (float32, int32), N: int32
+        T: (int32, int32), N: int32
     ](A: "T[N, N]", B: "T[N, N]", x: "T[N]", y: "T[N]"):
-        y_init: T[N] = 0.0
+        y_init: T[N] = 0
         y_fifo: T[N]
         tmp: T[N]
         compute_tmp(y_init, y_fifo, A, B, x, tmp)
@@ -72,14 +72,14 @@ def test_gesummv():
     # for CI test we use small problem size
     test_psize = "small"
     N = psize["gesummv"][test_psize]["N"]
-    concrete_type = float32
+    concrete_type = int32
     # functional correctness test
-    A = np.random.randint(10, size=(N, N)).astype(np.float32)
-    B = np.random.randint(10, size=(N, N)).astype(np.float32)
-    x = np.random.randint(10, size=(N)).astype(np.float32)
-    y = np.zeros(N).astype(np.float32)
-    y_ref = np.zeros(N).astype(np.float32)
-    alpha, beta = 0.1, 0.1
+    A = np.random.randint(1, 10, size=(N,N))
+    B = np.random.randint(1, 10, size=(N,N))
+    x = np.random.randint(1, 10, size=(N))
+    y = np.zeros(N).astype(np.int32)
+    y_ref = np.zeros(N).astype(np.int32)
+    alpha, beta = 10, 10
     gesummv_np(A, B, x, y_ref, alpha, beta)
     sch = gesummv(concrete_type, N, alpha, beta)
     mod = sch.build()

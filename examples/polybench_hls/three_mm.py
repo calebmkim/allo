@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -19,28 +19,28 @@ def three_mm_np(A, B, C, D):
 
 def three_mm(concrete_type, p, r, q, t, s):
     def mm1[
-        DType: (float32, int32), P: int32, Q: int32, R: int32
+        DType: (int32, int32), P: int32, Q: int32, R: int32
     ](A: "DType[P, Q]", B: "DType[Q, R]", out_AB: "DType[P, R]"):
         for i0, j0 in allo.grid(P, R, name="mm1"):
             for k0 in allo.reduction(Q):
                 out_AB[i0, j0] += A[i0, k0] * B[k0, j0]
 
     def mm2[
-        DType: (float32, int32), R: int32, S: int32, T: int32
+        DType: (int32, int32), R: int32, S: int32, T: int32
     ](C: "DType[R, S]", D: "DType[S, T]", out_CD: "DType[R, T]"):
         for i1, j1 in allo.grid(R, T, name="mm2"):
             for k1 in allo.reduction(S):
                 out_CD[i1, j1] += C[i1, k1] * D[k1, j1]
 
     def mm3[
-        DType: (float32, int32), P: int32, R: int32, T: int32
+        DType: (int32, int32), P: int32, R: int32, T: int32
     ](out_AB: "DType[P, R]", out_CD: "DType[R, T]", out_ABC: "DType[P, T]"):
         for i2, j2 in allo.grid(P, T, name="mm3"):
             for k2 in allo.reduction(R):
                 out_ABC[i2, j2] += out_AB[i2, k2] * out_CD[k2, j2]
 
     def kernel_3mm[
-        DType: (float32, int32), P: int32, Q: int32, R: int32, S: int32, T: int32
+        DType: (int32, int32), P: int32, Q: int32, R: int32, S: int32, T: int32
     ](
         A: "DType[P, Q]", B: "DType[Q, R]", C: "DType[R, S]", D: "DType[S, T]"
     ) -> "DType[P, T]":
@@ -105,13 +105,13 @@ def test_three_mm():
     T = psize["three_mm"][test_psize]["T"]
     S = psize["three_mm"][test_psize]["S"]
 
-    concrete_type = float32
+    concrete_type = int32
     sch = three_mm(concrete_type, P, R, Q, T, S)
     mod = sch.build()
-    A = np.random.randint(-10, 10, (P, Q)).astype(np.float32)
-    B = np.random.randint(-10, 10, (Q, R)).astype(np.float32)
-    C = np.random.randint(-10, 10, (R, S)).astype(np.float32)
-    D = np.random.randint(-10, 10, (S, T)).astype(np.float32)
+    A = np.random.randint(-10, 10, (P, Q))
+    B = np.random.randint(-10, 10, (Q, R))
+    C = np.random.randint(-10, 10, (R, S))
+    D = np.random.randint(-10, 10, (S, T))
     out = mod(A, B, C, D)
     out_ref = three_mm_np(A, B, C, D)
     np.testing.assert_allclose(out, out_ref, rtol=1e-5, atol=1e-5)

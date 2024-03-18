@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -16,7 +16,7 @@ def lu_np(A):
         for j in range(i):
             for k in range(j):
                 A[i, j] -= A[i, k] * A[k, j]
-            A[i, j] /= A[j, j]
+            A[i, j] = int(A[i,j] / A[j, j])
 
         for j in range(i, N):
             for k in range(i):
@@ -29,7 +29,7 @@ def lu(concrete_type, n):
             for j in range(i):
                 for k in range(j):
                     A[i, j] -= A[i, k] * A[k, j]
-                A[i, j] /= A[j, j]
+                A[i, j] = int(A[i,j] / A[j, j])
 
             for j in range(i, N):
                 for k in range(i):
@@ -51,7 +51,7 @@ def test_lu():
 
     # generate input data
     N = psize["lu"][test_psize]["N"]
-    A = np.random.rand(N, N).astype(np.float32)
+    A = np.random.randint(100, size=(N, N))
 
     # run reference
     A_ref = A.copy()
@@ -62,8 +62,8 @@ def test_lu():
     lu(int32, N)
 
     # verify
-    # np.testing.assert_allclose(A_ref, A_opt, rtol=1e-4, atol=1e-4)
+    np.testing.assert_allclose(A_ref, A_opt, rtol=1e-4, atol=1e-4)
 
 
 if __name__ == "__main__":
-    test_lu()
+    pytest.main([__file__])

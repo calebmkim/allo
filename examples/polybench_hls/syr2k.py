@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -19,8 +19,8 @@ def syr2k_np(A, B, C, alpha, beta):
                 C[i, j] += A[j, k] * alpha * B[i, k] + B[j, k] * alpha * A[i, k]
 
 
-def syr2k(concrete_type, M, N, alpha=1.5, beta=1.2):
-    def update_C[T: (float32, int32), N: int32](Cin: "T[N, N]", Cout: "T[N, N]"):
+def syr2k(concrete_type, M, N, alpha=15, beta=12):
+    def update_C[T: (int32, int32), N: int32](Cin: "T[N, N]", Cout: "T[N, N]"):
         for i0, j0 in allo.grid(N, N, name="update"):
             if j0 <= i0:
                 Cout[i0, j0] = beta * Cin[i0, j0]
@@ -28,7 +28,7 @@ def syr2k(concrete_type, M, N, alpha=1.5, beta=1.2):
                 Cout[i0, j0] = Cin[i0, j0]
 
     def compute_sum[
-        T: (float32, int32), N: int32, M: int32
+        T: (int32, int32), N: int32, M: int32
     ](
         A: "T[N, M]",
         A_copy: "T[N, M]",
@@ -50,7 +50,7 @@ def syr2k(concrete_type, M, N, alpha=1.5, beta=1.2):
             Cout[i2, j2] = buffer[i2, j2]
 
     def kernel_syr2k[
-        T: (float32, int32), N: int32, M: int32
+        T: (int32, int32), N: int32, M: int32
     ](
         A: "T[N, M]",
         A_copy: "T[N, M]",
@@ -92,13 +92,13 @@ def test_syr2k():
     test_psize = "small"
     M = psize["syr2k"][test_psize]["M"]
     N = psize["syr2k"][test_psize]["N"]
-    concrete_type = float32
-    alpha = 1.5
-    beta = 1.2
+    concrete_type = int32
+    alpha = 15
+    beta = 12
     sch = syr2k(concrete_type, M, N, alpha, beta)
-    A = np.random.randint(0, 10, (N, M)).astype(np.float32)
-    B = np.random.randint(0, 10, (N, M)).astype(np.float32)
-    C = np.random.randint(0, 10, (N, N)).astype(np.float32)
+    A = np.random.randint(0, 10, (N, M))
+    B = np.random.randint(0, 10, (N, M))
+    C = np.random.randint(0, 10, (N, N))
     C_golden = np.copy(C)
     syr2k_np(A, B, C_golden, alpha, beta)
     mod = sch.build()

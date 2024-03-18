@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32, index
+from allo.ir.types import int32, index
 import allo.ir.types as T
 
 
@@ -39,7 +39,7 @@ def nussinov_np(seq, table):
 
 
 def nussinov(concrete_type, n):
-    def kernel_nussinov[T: (float32, int32), N: int32](seq: "T[N]", table: "T[N, N]"):
+    def kernel_nussinov[T: (int32, int32), N: int32](seq: "T[N]", table: "T[N, N]"):
         for i_inv in range(N):
             i: index = N - 1 - i_inv
             for j in range(i + 1, N):
@@ -53,13 +53,13 @@ def nussinov(concrete_type, n):
 
                 if j - 1 >= 0 and i + 1 < N:
                     if i < j - 1:
-                        w: float32 = seq[i] + seq[j]
+                        w: int32 = seq[i] + seq[j]
 
-                        match: float32 = 0.0
+                        match: int32 = 0
                         if w == 3:
-                            match = 1.0
+                            match = 1
 
-                        s2: float32 = 0.0
+                        s2: int32 = 0
                         s2 = table[i + 1, j - 1] + match
 
                         if table[i, j] < s2:
@@ -69,7 +69,7 @@ def nussinov(concrete_type, n):
                             table[i, j] = table[i + 1, j - 1]
 
                 for k in range(i + 1, j):
-                    s3: float32 = table[i, k] + table[k + 1, j]
+                    s3: int32 = table[i, k] + table[k + 1, j]
                     if table[i, j] < s3:
                         table[i, j] = s3
 
@@ -85,11 +85,11 @@ def test_nussinov():
     # for CI test we use small problem size
     test_psize = "small"
     N = psize["nussinov"][test_psize]["N"]
-    concrete_type = float32
+    concrete_type = int32
     mod = nussinov(concrete_type, N)
 
-    seq = np.random.randint(0, 4, size=N).astype(np.float32)
-    table = np.zeros((N, N), dtype=np.float32)
+    seq = np.random.randint(0, 4, size=N)
+    table = np.zeros((N, N), dtype=np.int32)
     table_ref = table.copy()
     nussinov_np(seq, table_ref)
     mod(seq, table)

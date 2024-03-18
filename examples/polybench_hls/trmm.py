@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -19,17 +19,17 @@ def trmm_np(A, B, alpha):
 
 
 def top_trmm(concrete_type, m, n, alpha=1.5):
-    def S0[T: (float32, int32), M, N](A: "T[M, M]", B: "T[M, N]"):
+    def S0[T: (int32, int32), M, N](A: "T[M, M]", B: "T[M, N]"):
         for i1, j1 in allo.grid(M, N, name="update"):
             for k1 in allo.reduction(M):
                 if k1 > i1:
                     B[i1, j1] += A[k1, i1] * B[k1, j1]
 
-    def S1[T: (float32, int32), M, N](B: "T[M, N]"):
+    def S1[T: (int32, int32), M, N](B: "T[M, N]"):
         for i0, j0 in allo.grid(M, N, name="mul"):
             B[i0, j0] = B[i0, j0] * alpha
 
-    def kernel_trmm[T: (float32, int32), M, N](A: "T[M, M]", B: "T[M, N]"):
+    def kernel_trmm[T: (int32, int32), M, N](A: "T[M, M]", B: "T[M, N]"):
         S0[T, M, N](A, B)
         S1[T, M, N](B)
 
@@ -60,11 +60,11 @@ def test_trmm():
     test_psize = "small"
     M = psize["trmm"][test_psize]["M"]
     N = psize["trmm"][test_psize]["N"]
-    concrete_type = float32
+    concrete_type = int32
     alpha = 1.5
     s = top_trmm(concrete_type, M, N, alpha)
-    A = np.random.randint(0, 10, size=(M, M)).astype(np.float32)
-    B = np.random.randint(0, 10, size=(M, N)).astype(np.float32)
+    A = np.random.randint(10, size=(M, M))
+    B = np.random.randint(10, size=(M, N))
     B_golden = B.copy()
     trmm_np(A, B_golden, alpha)
     mod = s.build()

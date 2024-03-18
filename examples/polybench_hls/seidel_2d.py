@@ -7,7 +7,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -15,7 +15,7 @@ def seidel_2d_np(A, TSTEPS):
     for t in range(TSTEPS):
         for i in range(1, A.shape[0] - 1):
             for j in range(1, A.shape[1] - 1):
-                A[i, j] = (
+                A[i, j] = int(
                     A[i - 1, j - 1]
                     + A[i - 1, j]
                     + A[i - 1, j + 1]
@@ -25,15 +25,15 @@ def seidel_2d_np(A, TSTEPS):
                     + A[i + 1, j - 1]
                     + A[i + 1, j]
                     + A[i + 1, j + 1]
-                ) / 9.0
+                ) / 9
 
 
 def seidel_2d(concrete_type, TSTEPS, N):
-    def kernel_seidel_2d[T: (int32, float32), TSTEPS: int32, N: int32](A: "T[N, N]"):
+    def kernel_seidel_2d[T: (int32, int32), TSTEPS: int32, N: int32](A: "T[N, N]"):
         for t in range(TSTEPS):
             for i in range(1, N - 1):
                 for j in range(1, N - 1):
-                    A[i, j] = (
+                    A[i, j] = int((
                         A[i - 1, j - 1]
                         + A[i - 1, j]
                         + A[i - 1, j + 1]
@@ -43,7 +43,7 @@ def seidel_2d(concrete_type, TSTEPS, N):
                         + A[i + 1, j - 1]
                         + A[i + 1, j]
                         + A[i + 1, j + 1]
-                    ) / 9
+                    ) / 9)
 
     s = allo.customize(kernel_seidel_2d, instantiate=[concrete_type, TSTEPS, N])
     return s.build()
@@ -58,10 +58,10 @@ def test_seidel_2d():
     test_psize = "small"
     TSTEPS = psize["seidel_2d"][test_psize]["TSTEPS"]
     N = psize["seidel_2d"][test_psize]["N"]
-    concrete_type = float32
+    concrete_type = int32
     mod = seidel_2d(concrete_type, TSTEPS, N)
     # functional correctness test
-    A = np.random.randint(10, size=(N, N)).astype(np.float32)
+    A = np.random.randint(10, size=(N, N))
     A_ref = A.copy()
     mod(A)
     seidel_2d_np(A_ref, TSTEPS)

@@ -105,6 +105,22 @@ def test_two_mm():
     output_ref = two_mm_np(A, B, C, D, 1, 5)
     np.testing.assert_allclose(output, output_ref, rtol=1e-5, atol=1e-5)
 
+def print_two_mm():
+    """
+    Prints HLS implementation of two_mm
+    """
+    setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
+    with open(setting_path, "r") as fp:
+        psize = json.load(fp)
+    # for CI test we use small problem size
+    test_psize = "small"
+    P = psize["two_mm"][test_psize]["P"]
+    Q = psize["two_mm"][test_psize]["Q"]
+    R = psize["two_mm"][test_psize]["R"]
+    S = psize["two_mm"][test_psize]["S"]
+    sch = two_mm(int32, P, R, Q, S)
+    mod = sch.build(target="vhls")
+    print(mod)
 
 if __name__ == "__main__":
     pytest.main([__file__])

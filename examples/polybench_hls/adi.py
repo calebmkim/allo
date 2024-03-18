@@ -28,14 +28,14 @@ def adi_np(u, v, p, q, TSTEPS, N):
 
     for t in range(1, TSTEPS + 1):
         for i in range(1, N - 1):
-            v[0][i] = 1
-            p[i][0] = 0
+            v[0][i] = 1.0
+            p[i][0] = 0.0
             q[i][0] = v[0][i]
             for j in range(1, N - 1):
                 p[i][j] = int(-c / (a * p[i][j - 1] + b))
                 q[i][j] = int((
-                    -d * u[j][i - 1]
-                    + (1 + 2 * d) * u[j][i]
+                    (1 + 2 * d) * u[j][i]
+                    - (d * u[j][i - 1])
                     - f * u[j][i + 1]
                     - a * q[i][j - 1]
                 ) / (a * p[i][j - 1] + b))
@@ -44,8 +44,8 @@ def adi_np(u, v, p, q, TSTEPS, N):
             for j in range(N - 2, 0, -1):
                 v[j][i] = p[i][j] * v[j + 1][i] + q[i][j]
         for i in range(1, N - 1):
-            u[i][0] = 1
-            p[i][0] = 0
+            u[i][0] = 1.0
+            p[i][0] = 0.0
             q[i][0] = u[i][0]
             for j in range(1, N - 1):
                 p[i][j] = int(-f / (d * p[i][j - 1] + e))

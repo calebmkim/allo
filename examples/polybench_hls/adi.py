@@ -19,12 +19,12 @@ def adi_np(u, v, p, q, TSTEPS, N):
     mul1 = B1 * DT / (DX * DX)
     mul2 = B2 * DT / (DY * DY)
 
-    a = -mul1 / 2.0
-    b = 1.0 + mul1
-    c = a
-    d = -mul2 / 2.0
-    e = 1.0 + mul2
-    f = d
+    a = int(-mul1 / 2.0)
+    b = int(1.0 + mul1)
+    c = int(a)
+    d = int(-mul2 / 2.0)
+    e = int(1.0 + mul2)
+    f = int(d)
 
     for t in range(1, TSTEPS + 1):
         for i in range(1, N - 1):
@@ -69,12 +69,12 @@ def adi(ttype, TSTEPS, N):
     mul1 = B1 * DT / (DX * DX)
     mul2 = B2 * DT / (DY * DY)
 
-    a = -mul1 / 2.0
-    b = 1.0 + mul1
-    c = a
-    d = -mul2 / 2.0
-    e = 1.0 + mul2
-    f = d
+    a = int(-mul1 / 2.0)
+    b = int(1.0 + mul1)
+    c = int(a)
+    d = int(-mul2 / 2.0)
+    e = int(1.0 + mul2)
+    f = int(d)
 
     def kernel_adi[
         T: (float32, int32), TSTEPS: int32, N: int32

@@ -115,6 +115,7 @@ def adi(ttype, TSTEPS, N):
                     u[i, j] = p[i, j] * u[i, j + 1] + q[i, j]
 
     s = allo.customize(kernel_adi, instantiate=[ttype, TSTEPS, N])
+    return s
 
 def test_adi():
     # read problem size settings

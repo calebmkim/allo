@@ -71,7 +71,7 @@ def adi(ttype, TSTEPS, N):
 
     a = int(-mul1 / 2)
     b = int(1 + mul1)
-    c = (a)
+    c = int(a)
     d = (-mul2 / 2)
     e = (1 + mul2)
     f = (d)

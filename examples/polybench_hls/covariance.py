@@ -38,14 +38,14 @@ def covariance(type, m, n):
             total: int32 = 0.0
             for k in allo.grid(N):
                 total += data[k, x]
-            mean[x] = total // N
+            mean[x] = int(total / N)
 
         # Compute covariance
         for i, j in allo.grid(M, M):
             covariance: int32 = 0
             for p in allo.grid(N):
                 covariance += (data[p, i] - mean[i]) * (data[p, j] - mean[j])
-            cov[i, j] = covariance // (N - 1)
+            cov[i, j] = int(covariance / (N - 1))
 
     s = allo.customize(kernel_covariance, instantiate=[type, m, n])
     return s

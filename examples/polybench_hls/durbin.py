@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -31,9 +31,9 @@ def durbin_np(r, y):
 
 
 def durbin(concrete_type, n):
-    def kernel_durbin[T: (float32, int32), N: int32](r: "T[N]", y: "T[N]"):
+    def kernel_durbin[T: (int32, int32), N: int32](r: "T[N]", y: "T[N]"):
         y[0] = -r[0]
-        beta: T = 1.0
+        beta: T = 1
         alpha: T = -r[0]
 
         for k in range(1, N):
@@ -56,7 +56,7 @@ def durbin(concrete_type, n):
             y[k] = alpha
 
     s = allo.customize(kernel_durbin, instantiate=[concrete_type, n])
-    return s.build()
+    return s
 
 
 def test_durbin():
@@ -67,12 +67,13 @@ def test_durbin():
     # for CI test we use small problem size
     test_psize = "small"
     N = psize["durbin"][test_psize]["N"]
-    concrete_type = float32
-    r = np.random.randint(1, 10, size=(N,)).astype(np.float32)
-    y = np.random.randint(1, 10, size=(N,)).astype(np.float32)
+    concrete_type = int32
+    r = np.random.randint(1, 10, size=(N,))
+    y = np.random.randint(1, 10, size=(N,))
     y_golden = y.copy()
     durbin_np(r, y_golden)
-    mod = durbin(concrete_type, N)
+    s = durbin(concrete_type, N)
+    mod = s.build()
     mod(r.copy(), y)
     np.testing.assert_allclose(y, y_golden, rtol=1e-5, atol=1e-5)
 

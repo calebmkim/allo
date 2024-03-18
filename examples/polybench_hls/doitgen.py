@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -24,7 +24,7 @@ def doitgen_np(A, x, sum):
 
 def doitgen(concrete_type, qq, rr, pp, ss):
     def kernel_doitgen[
-        T: (float32, int32), R: int32, Q: int32, P: int32, S: int32
+        T: (int32, int32), R: int32, Q: int32, P: int32, S: int32
     ](A: "T[R, Q, S]", x: "T[P, S]", sum_: "T[P]"):
         for r, q in allo.grid(R, Q):
             for p in allo.grid(P):
@@ -35,7 +35,7 @@ def doitgen(concrete_type, qq, rr, pp, ss):
                 A[r, q, p1] = sum_[p1]
 
     s0 = allo.customize(kernel_doitgen, instantiate=[concrete_type, rr, qq, pp, ss])
-    return s0.build()
+    return s0
 
 
 def test_doitgen():
@@ -51,9 +51,9 @@ def test_doitgen():
     S = psize["doitgen"][test_psize]["S"]
 
     # generate input data
-    A = np.random.rand(R, Q, S).astype(np.float32)
-    x = np.random.rand(P, S).astype(np.float32)
-    sum_ = np.zeros(P).astype(np.float32)
+    A = np.random.randint(100, size=(R, Q, S))
+    x = np.random.randint(100, size=(P, S))
+    sum_ = np.zeros(P).astype(np.int32)
     sum_ref = sum_.copy()
 
     # run reference
@@ -64,7 +64,9 @@ def test_doitgen():
     # run allo
     A_opt = A.copy()
     x_opt = x.copy()
-    doitgen(float32, Q, R, P, S)(A_opt, x_opt, sum_)
+    s0 =  doitgen(int32, Q, R, P, S)
+    mod = s0.build()
+    mod(A_opt, x_opt, sum_)
 
     # compare
     np.testing.assert_allclose(A_ref, A_opt)

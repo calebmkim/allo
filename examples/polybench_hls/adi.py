@@ -21,8 +21,8 @@ def adi_np(u, v, p, q, TSTEPS, N):
 
     a = int(-mul1 / 2)
     b = int(1 + mul1)
-    c = (a)
-    d = (-mul2 / 2)
+    c = int(a)
+    d = int(-mul2 / 2)
     e = (1 + mul2)
     f = (d)
 
@@ -72,7 +72,7 @@ def adi(ttype, TSTEPS, N):
     a = int(-mul1 / 2)
     b = int(1 + mul1)
     c = int(a)
-    d = -13
+    d = -5.5
     e = (1 + mul2)
     f = (d)
 
@@ -86,10 +86,10 @@ def adi(ttype, TSTEPS, N):
                 q[i, 0] = v[0, i]
                 for j in range(1, N - 1):
                     p[i, j] = (-c / ((a * p[i, j - 1] + b)))
-                    q[i, j] = ((
+                    q[i, j] = (
                         -d * u[j, i - 1]
                         + (1 + (2 * d)) * u[j, i]
-                        - (f * u[j, i + 1])
+                        - (f * u[j, i + 1]
                         - a * q[i, j - 1]
                     ) / (a * p[i, j - 1] + b))
 

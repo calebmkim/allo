@@ -35,7 +35,7 @@ def adi_np(u, v, p, q, TSTEPS, N):
                 p[i][j] = int(-c / (a * p[i][j - 1] + b))
                 q[i][j] = int((
                     -d * u[j][i - 1]
-                    + (1.0 + 2.0 * d) * u[j][i]
+                    + (1 + 2 * d) * u[j][i]
                     - f * u[j][i + 1]
                     - a * q[i][j - 1]
                 ) / (a * p[i][j - 1] + b))
@@ -51,7 +51,7 @@ def adi_np(u, v, p, q, TSTEPS, N):
                 p[i][j] = int(-f / (d * p[i][j - 1] + e))
                 q[i][j] = int((
                     -a * v[i - 1][j]
-                    + (1.0 + 2.0 * a) * v[i][j]
+                    + (1 + 2 * a) * v[i][j]
                     - c * v[i + 1][j]
                     - d * q[i][j - 1]
                 ) / (d * p[i][j - 1] + e))
@@ -105,7 +105,7 @@ def adi(ttype, TSTEPS, N):
                     p[i, j] = int(-f / (d * p[i, j - 1] + e))
                     q[i, j] = int((
                         -a * v[i - 1, j]
-                        + (1.0 + 2.0 * a) * v[i, j]
+                        + (1 + 2 * a) * v[i, j]
                         - c * v[i + 1, j]
                         - d * q[i, j - 1]
                     ) / (d * p[i, j - 1] + e))

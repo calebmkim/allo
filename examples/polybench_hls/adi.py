@@ -81,8 +81,8 @@ def adi(ttype, TSTEPS, N):
     ](u: "T[N, N]", v: "T[N, N]", p: "T[N, N]", q: "T[N, N]"):
         for t in range(1, TSTEPS + 1):
             for i in range(1, N - 1):
-                v[0, i] = 1.0
-                p[i, 0] = 0.0
+                v[0, i] = 1
+                p[i, 0] = 0
                 q[i, 0] = v[0, i]
                 for j in range(1, N - 1):
                     p[i, j] = -c / (a * p[i, j - 1] + b)
@@ -105,7 +105,7 @@ def adi(ttype, TSTEPS, N):
                     p[i, j] = -f / (d * p[i, j - 1] + e)
                     q[i, j] = (
                         -a * v[i - 1, j]
-                        + (1.0 + 2.0 * a) * v[i, j]
+                        + (1 + 2 * a) * v[i, j]
                         - c * v[i + 1, j]
                         - d * q[i, j - 1]
                     ) / (d * p[i, j - 1] + e)

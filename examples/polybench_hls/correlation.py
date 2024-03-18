@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -48,7 +48,7 @@ def correlation_np(data, mean, stddev, corr, M, N, N_float, epsilon):
 
 def correlation(concrete_type, M, N, N_float, epsilon):
     def compute_mean[
-        T: (float32, int32), M: int32, N: int32
+        T: (int32, int32), M: int32, N: int32
     ](data: "T[N, M]", mean: "T[M]"):
         for x in allo.grid(M):
             total: T = 0.0
@@ -57,7 +57,7 @@ def correlation(concrete_type, M, N, N_float, epsilon):
             mean[x] = total / N
 
     def compute_stddev[
-        T: (float32, int32), M: int32, N: int32
+        T: (int32, int32), M: int32, N: int32
     ](data: "T[N, M]", mean: "T[M]", mean_passed_on: "T[M]", stddev: "T[M]"):
         for x in allo.grid(M):
             variance: T = 0.0
@@ -70,7 +70,7 @@ def correlation(concrete_type, M, N, N_float, epsilon):
                 stddev[x] = 1.0
 
     def center_reduce[
-        T: (float32, int32), M: int32, N: int32
+        T: (int32, int32), M: int32, N: int32
     ](data: "T[N, M]", data_out: "T[N, M]", mean: "T[M]", stddev: "T[M]"):
         for x in allo.grid(N):
             for y in allo.grid(M):
@@ -80,7 +80,7 @@ def correlation(concrete_type, M, N, N_float, epsilon):
                 data_out[x, y] = d
 
     def compute_corr[
-        T: (float32, int32), M: int32, N: int32
+        T: (int32, int32), M: int32, N: int32
     ](data: "T[N, M]", corr: "T[M, M]"):
         for i in range(M - 1):
             corr[i, i] = 1.0
@@ -95,7 +95,7 @@ def correlation(concrete_type, M, N, N_float, epsilon):
         corr[M - 1, M - 1] = 1.0
 
     def kernel_correlation[
-        T: (float32, int32), M: int32, N: int32
+        T: (int32, int32), M: int32, N: int32
     ](
         data_mean: "T[N, M]",
         data_stddev: "T[N, M]",
@@ -147,16 +147,16 @@ def test_correlation():
     test_psize = "small"
     M = psize["correlation"][test_psize]["M"]
     N = psize["correlation"][test_psize]["N"]
-    N_float = float(N)
+    N_float = int(N)
     epsilon = 1e-5
-    concrete_type = float32
+    concrete_type = int32
     sch = correlation(concrete_type, M, N, N_float, epsilon)
     mod = sch.build()
-    data = np.random.rand(N, M).astype(np.float32)
-    mean = np.zeros((M,), dtype=np.float32)
-    stddev = np.zeros((M,), dtype=np.float32)
-    corr = np.zeros((M, M), dtype=np.float32)
-    corr_ref = np.zeros((M, M), dtype=np.float32)
+    data = np.random.randint(100, size=(N, M))
+    mean = np.zeros((M,), dtype=np.int32)
+    stddev = np.zeros((M,), dtype=np.int32)
+    corr = np.zeros((M, M), dtype=np.int32)
+    corr_ref = np.zeros((M, M), dtype=np.int32)
     correlation_np(data.copy(), mean, stddev, corr_ref, M, N, N_float, epsilon)
     mod = sch.build()
     mod(data.copy(), data.copy(), data.copy(), corr)

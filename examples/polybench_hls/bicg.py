@@ -7,7 +7,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -22,7 +22,7 @@ def bicg_np(A, s, q, p, r):
 
 def top_bicg(concrete_type, M, N):
     def stageS[
-        T: (float32, int32), M: int32, N: int32
+        T: (int32, int32), M: int32, N: int32
     ](A: "T[N, M]", r: "T[N]", s: "T[M]"):
         for i0 in range(N):  # pipeline
             r: T = r[i0]
@@ -30,14 +30,14 @@ def top_bicg(concrete_type, M, N):
                 s[j0] += r * A[i0, j0]
 
     def stageQ[
-        T: (float32, int32), M: int32, N: int32
+        T: (int32, int32), M: int32, N: int32
     ](A: "T[N, M]", p: "T[M]", q: "T[N]"):
         for i1 in range(N):
             for j1 in range(M):
                 q[i1] += A[i1, j1] * p[j1]
 
     def kernel_bicg[
-        T: (float32, int32), M: int32, N: int32
+        T: (int32, int32), M: int32, N: int32
     ](A: "T[N, M]", A_copy: "T[N, M]", p: "T[M]", r: "T[N]", q: "T[N]", s: "T[M]"):
         stageS(A, r, s)
         stageQ(A_copy, p, q)
@@ -70,16 +70,16 @@ def test_bicg():
     test_psize = "small"
     M = psize["bicg"][test_psize]["M"]
     N = psize["bicg"][test_psize]["N"]
-    concrete_type = float32
+    concrete_type = int32
     sch = top_bicg(concrete_type, M, N)
     mod = sch.build()
-    A = np.random.rand(N, M).astype(np.float32)
-    s = np.zeros(M).astype(np.float32)
-    q = np.zeros(N).astype(np.float32)
-    s_ref = np.zeros(M).astype(np.float32)
-    q_ref = np.zeros(N).astype(np.float32)
-    p = np.random.rand(M).astype(np.float32)
-    r = np.random.rand(N).astype(np.float32)
+    A =  np.random.randint(100, size=(N, M))
+    s = np.zeros(M).astype(np.int32)
+    q = np.zeros(N).astype(np.int32)
+    s_ref = np.zeros(M).astype(np.int32)
+    q_ref = np.zeros(N).astype(np.int32)
+    p = np.random.rand(M).astype(np.int32)
+    r = np.random.rand(N).astype(np.int32)
     bicg_np(A, s_ref, q_ref, p, r)
     mod(A, A, p, r, q, s)
     np.testing.assert_allclose(s, s_ref, rtol=1e-5, atol=1e-5)

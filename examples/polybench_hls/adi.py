@@ -49,7 +49,7 @@ def adi_np(u, v, p, q, TSTEPS, N):
             q[i][0] = u[i][0]
             for j in range(1, N - 1):
                 p[i][j] = int(-f / (d * p[i][j - 1] + e))
-                q[i][j] = int((
+                q[i][j] = ((
                     -a * v[i - 1][j]
                     + (1 + 2 * a) * v[i][j]
                     - c * v[i + 1][j]

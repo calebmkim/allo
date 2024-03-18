@@ -97,22 +97,22 @@ def adi(ttype, TSTEPS, N):
                 for j_rev in range(N - 1):
                     j: index = N - 2 - j_rev
                     v[j, i] = p[i, j] * v[j + 1, i] + q[i, j]
-            # for i in range(1, N - 1):
-            #     u[i, 0] = 1
-            #     p[i, 0] = 0
-            #     q[i, 0] = u[i, 0]
-            #     for j in range(1, N - 1):
-            #         p[i, j] = (-f / (d * p[i, j - 1] + e))
-            #         q[i, j] = ((
-            #             -a * v[i - 1, j]
-            #             + (1.0 + 2.0 * a) * v[i, j]
-            #             - c * v[i + 1, j]
-            #             - d * q[i, j - 1]
-            #         ) / (d * p[i, j - 1] + e))
-            #     u[i, N - 1] = 1
-            #     for j_rev in range(N - 1):
-            #         j: index = N - 2 - j_rev
-            #         u[i, j] = p[i, j] * u[i, j + 1] + q[i, j]
+            for i in range(1, N - 1):
+                u[i, 0] = 1
+                p[i, 0] = 0
+                q[i, 0] = u[i, 0]
+                for j in range(1, N - 1):
+                    p[i, j] = (-f / (d * p[i, j - 1] + e))
+                    q[i, j] = ((
+                        -a * v[i - 1, j]
+                        + (1.0 + 2.0 * a) * v[i, j]
+                        - c * v[i + 1, j]
+                        - d * q[i, j - 1]
+                    ) / (d * p[i, j - 1] + e))
+                u[i, N - 1] = 1
+                for j_rev in range(N - 1):
+                    j: index = N - 2 - j_rev
+                    u[i, j] = p[i, j] * u[i, j + 1] + q[i, j]
 
     s = allo.customize(kernel_adi, instantiate=[ttype, TSTEPS, N])
     return s

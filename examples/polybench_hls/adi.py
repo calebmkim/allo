@@ -1,5 +1,5 @@
 # Copyright Allo authors. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2
+# SPDX-License-Identifier: Apache-2.0
 
 import pytest
 import allo
@@ -7,66 +7,116 @@ import os
 import json
 import numpy as np
 import allo.ir.types as T
-from allo.ir.types import float32, int32, index, Fixed
+from allo.ir.types import float32, int32, index
 
 
-def adi(ttype, TSTEPS, N):
-    DX = 1 / N
-    DY = 1 / N
-    DT = 1 / TSTEPS
-    B1 = 2
-    B2 = 1
+def adi_np(u, v, p, q, TSTEPS, N):
+    DX = 1.0 / N
+    DY = 1.0 / N
+    DT = 1.0 / TSTEPS
+    B1 = 2.0
+    B2 = 1.0
     mul1 = B1 * DT / (DX * DX)
     mul2 = B2 * DT / (DY * DY)
 
-    a = -mul1 / 2
-    b = 1 + mul1
+    a = -mul1 / 2.0
+    b = 1.0 + mul1
     c = a
-    d = -mul2 / 2
-    e = 1 + mul2
+    d = -mul2 / 2.0
+    e = 1.0 + mul2
+    f = d
+
+    for t in range(1, TSTEPS + 1):
+        for i in range(1, N - 1):
+            v[0][i] = 1.0
+            p[i][0] = 0.0
+            q[i][0] = v[0][i]
+            for j in range(1, N - 1):
+                p[i][j] = -c / (a * p[i][j - 1] + b)
+                q[i][j] = (
+                    -d * u[j][i - 1]
+                    + (1.0 + 2.0 * d) * u[j][i]
+                    - f * u[j][i + 1]
+                    - a * q[i][j - 1]
+                ) / (a * p[i][j - 1] + b)
+
+            v[N - 1][i] = 1.0
+            for j in range(N - 2, 0, -1):
+                v[j][i] = p[i][j] * v[j + 1][i] + q[i][j]
+        for i in range(1, N - 1):
+            u[i][0] = 1.0
+            p[i][0] = 0.0
+            q[i][0] = u[i][0]
+            for j in range(1, N - 1):
+                p[i][j] = -f / (d * p[i][j - 1] + e)
+                q[i][j] = (
+                    -a * v[i - 1][j]
+                    + (1.0 + 2.0 * a) * v[i][j]
+                    - c * v[i + 1][j]
+                    - d * q[i][j - 1]
+                ) / (d * p[i][j - 1] + e)
+            u[i][N - 1] = 1.0
+            for j in range(N - 2, 0, -1):
+                u[i][j] = p[i][j] * u[i][j + 1] + q[i][j]
+
+
+def adi(ttype, TSTEPS, N):
+    DX = 1.0 / N
+    DY = 1.0 / N
+    DT = 1.0 / TSTEPS
+    B1 = 2.0
+    B2 = 1.0
+    mul1 = B1 * DT / (DX * DX)
+    mul2 = B2 * DT / (DY * DY)
+
+    a = -mul1 / 2.0
+    b = 1.0 + mul1
+    c = a
+    d = -mul2 / 2.0
+    e = 1.0 + mul2
     f = d
 
     def kernel_adi[
-        T: (ttype, int32), TSTEPS: int32, N: int32
+        T: (float32, int32), TSTEPS: int32, N: int32
     ](u: "T[N, N]", v: "T[N, N]", p: "T[N, N]", q: "T[N, N]"):
         for t in range(1, TSTEPS + 1):
             for i in range(1, N - 1):
-                v[0, i] = 1
-                p[i, 0] = 0
+                v[0, i] = 1.0
+                p[i, 0] = 0.0
                 q[i, 0] = v[0, i]
                 for j in range(1, N - 1):
                     p[i, j] = -c / (a * p[i, j - 1] + b)
                     q[i, j] = (
                         -d * u[j, i - 1]
-                        + (1 + 2 * d) * u[j, i]
+                        + (1.0 + 2.0 * d) * u[j, i]
                         - f * u[j, i + 1]
                         - a * q[i, j - 1]
                     ) / (a * p[i, j - 1] + b)
 
-                v[N - 1, i] = 1
+                v[N - 1, i] = 1.0
                 for j_rev in range(N - 1):
                     j: index = N - 2 - j_rev
                     v[j, i] = p[i, j] * v[j + 1, i] + q[i, j]
             for i in range(1, N - 1):
-                u[i, 0] = 1
-                p[i, 0] = 0
+                u[i, 0] = 1.0
+                p[i, 0] = 0.0
                 q[i, 0] = u[i, 0]
                 for j in range(1, N - 1):
                     p[i, j] = -f / (d * p[i, j - 1] + e)
                     q[i, j] = (
                         -a * v[i - 1, j]
-                        + (1 + 2 * a) * v[i, j]
+                        + (1.0 + 2.0 * a) * v[i, j]
                         - c * v[i + 1, j]
                         - d * q[i, j - 1]
                     ) / (d * p[i, j - 1] + e)
-                u[i, N - 1] = 1
+                u[i, N - 1] = 1.0
                 for j_rev in range(N - 1):
                     j: index = N - 2 - j_rev
                     u[i, j] = p[i, j] * u[i, j + 1] + q[i, j]
 
     s = allo.customize(kernel_adi, instantiate=[ttype, TSTEPS, N])
-    code = s.build(target="vhls")
-    print(code)
+    mod = s.build()
+    return mod
 
 
 def test_adi():
@@ -80,8 +130,26 @@ def test_adi():
     TSTEPS = psize["adi"][test_psize]["TSTEPS"]
     N = psize["adi"][test_psize]["N"]
 
-    adi(Fixed(32, 0), TSTEPS, N)
+    u = np.random.randint(0, 100, (N, N))
+    v = np.random.randint(0, 100, (N, N))
+    p = np.random.randint(0, 100, (N, N))
+    q = np.random.randint(0, 100, (N, N))
+
+    u_ref = u.copy()
+    v_ref = v.copy()
+    p_ref = p.copy()
+    q_ref = q.copy()
+
+    adi_np(u_ref, v_ref, p_ref, q_ref, TSTEPS, N)
+
+    mod = adi(float32, TSTEPS, N)
+    mod(u, v, p, q)
+
+    np.testing.assert_allclose(u, u_ref, rtol=1e-5, atol=1e-5)
+    np.testing.assert_allclose(v, v_ref, rtol=1e-5, atol=1e-5)
+    np.testing.assert_allclose(p, p_ref, rtol=1e-5, atol=1e-5)
+    np.testing.assert_allclose(q, q_ref, rtol=1e-5, atol=1e-5)
 
 
 if __name__ == "__main__":
-    test_adi()
+    pytest.main([__file__])

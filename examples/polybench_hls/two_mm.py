@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -18,31 +18,31 @@ def two_mm_np(A, B, C, D, alpha, beta):
 
 
 def two_mm(concrete_type, p, r, q, s):
-    alpha = 0.1
-    beta = 0.5
+    alpha = 1
+    beta = 5
 
     def mm1[
-        T: (float32, int32), P: int32, Q: int32, R: int32
+        T: (int32, int32), P: int32, Q: int32, R: int32
     ](A: "T[P, Q]", B: "T[Q, R]", out_AB: "T[P, R]"):
         for i0, j0 in allo.grid(P, R, name="mm1"):
             for k0 in allo.reduction(Q):
                 out_AB[i0, j0] += A[i0, k0] * B[k0, j0]
 
     def mm2[
-        T: (float32, int32), P: int32, R: int32, S: int32
+        T: (int32, int32), P: int32, R: int32, S: int32
     ](out_AB: "T[P, R]", C: "T[R, S]", out_ABC: "T[P, S]"):
         for i1, j1 in allo.grid(P, S, name="mm2"):
             for k1 in allo.reduction(R):
                 out_ABC[i1, j1] += out_AB[i1, k1] * C[k1, j1]
 
     def ele_add[
-        T: (float32, int32), P: int32, S: int32
+        T: (int32, int32), P: int32, S: int32
     ](out_ABC: "T[P, S]", D: "T[P, S]", output: "T[P, S]"):
         for i2, j2 in allo.grid(P, S):
             output[i2, j2] = out_ABC[i2, j2] * beta + D[i2, j2] * alpha
 
     def kernel_2mm[
-        T: (float32, int32), P: int32, R: int32, Q: int32, S: int32
+        T: (int32, int32), P: int32, R: int32, Q: int32, S: int32
     ](A: "T[P, Q]", B: "T[Q, R]", C: "T[R, S]", D: "T[P, S]") -> "T[P, S]":
         out_AB: T[P, R]
         out_ABC: T[P, S]
@@ -94,15 +94,15 @@ def test_two_mm():
     Q = psize["two_mm"][test_psize]["Q"]
     R = psize["two_mm"][test_psize]["R"]
     S = psize["two_mm"][test_psize]["S"]
-    dtype = np.float32
+    dtype = np.int32
     A = np.random.rand(P, Q).astype(dtype)
     B = np.random.rand(Q, R).astype(dtype)
     C = np.random.rand(R, S).astype(dtype)
     D = np.random.rand(P, S).astype(dtype)
-    sch = two_mm(float32, P, R, Q, S)
+    sch = two_mm(int32, P, R, Q, S)
     mod = sch.build()
     output = mod(A, B, C, D)
-    output_ref = two_mm_np(A, B, C, D, 0.1, 0.5)
+    output_ref = two_mm_np(A, B, C, D, 1, 5)
     np.testing.assert_allclose(output, output_ref, rtol=1e-5, atol=1e-5)
 
 

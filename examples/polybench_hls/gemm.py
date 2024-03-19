@@ -16,7 +16,7 @@ def gemm_np(A, B, C, beta):
     return out_ABC
 
 
-def gemm(concrete_type, p, r, q, beta=0.1):
+def gemm(concrete_type, p, r, q, beta=10):
     def mm1[
         T: (int32, int32), P: int32, Q: int32, R: int32
     ](A: "T[P, Q]", B: "T[Q, R]", out_AB: "T[P, R]"):

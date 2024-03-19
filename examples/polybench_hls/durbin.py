@@ -13,7 +13,7 @@ Int32 = ctypes.c_int32
 
 
 def durbin_np(r, y):
-    z = np.zeros_like(y)
+    z = np.zeros_like(y).astype(Int32)
     N = r.shape[0]
     y[0] = -r[0]
     beta = 1.0

@@ -105,4 +105,4 @@ def print_covariance():
     print(mod)
 
 if __name__ == "__main__":
-    print_covariance()
+    pytest.main([__file__])

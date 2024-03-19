@@ -38,9 +38,9 @@ def durbin(concrete_type, n):
 
         for k in range(1, N):
             beta = (1 - alpha * alpha) * beta
-            sum_: T = 0.0
+            sum_: T = 0
 
-            z: T[N] = 0.0
+            z: T[N] = 0
             for i in range(k):
                 sum_ = sum_ + r[k - i - 1] * y[i]
 

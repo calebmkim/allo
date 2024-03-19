@@ -53,7 +53,8 @@ def test_cholesky():
 
     # generate input data
     N = psize["cholesky"][test_psize]["N"]
-    A = np.random.randint(10, size=(N, N))
+    # A = np.random.randint(10, size=(N, N))
+    A = np.random.rand(N, N).astype(np.float32)
 
     # run reference
     A_ref = A.copy()

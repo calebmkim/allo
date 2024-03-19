@@ -51,7 +51,7 @@ def test_cholesky():
 
     # generate input data
     N = psize["cholesky"][test_psize]["N"]
-    A = np.random.rand(N, N).astype(np.float32)
+    A = np.random.randint(10, size=(N, N))
 
     # run reference
     A_ref = A.copy()
@@ -59,7 +59,7 @@ def test_cholesky():
 
     # run allo
     A_opt = A.copy()
-    s = cholesky(float32, N)
+    s = cholesky(int32, N)
     s(A_opt)
 
     # verify

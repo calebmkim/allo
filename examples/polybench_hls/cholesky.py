@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32
+from allo.ir.types import int32, float32
 import allo.ir.types as T
 
 
@@ -25,7 +25,7 @@ def cholesky_np(A):
 
 
 def cholesky(concrete_type, n):
-    def kernel_cholesky[T: (int32, int32), N: int32](A: "T[N, N]"):
+    def kernel_cholesky[T: (int32, float32), N: int32](A: "T[N, N]"):
         for i in range(N):
             # Case: j < i
             for j in range(i):
@@ -51,7 +51,7 @@ def test_cholesky():
 
     # generate input data
     N = psize["cholesky"][test_psize]["N"]
-    A = np.random.randint(100, size=(N, N))
+    A = np.random.rand(N, N).astype(np.float32)
 
     # run reference
     A_ref = A.copy()
@@ -59,7 +59,7 @@ def test_cholesky():
 
     # run allo
     A_opt = A.copy()
-    s = cholesky(int32, N)
+    s = cholesky(float32, N)
     s(A_opt)
 
     # verify

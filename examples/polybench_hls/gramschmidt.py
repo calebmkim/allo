@@ -21,7 +21,7 @@ def gramschmidt_np(A, Q, R):
         R[k, k] = nrm
 
         for i in range(M):
-            Q[i, k] = A[i, k] / R[k, k]
+            Q[i, k] = int(A[i, k] / R[k, k])
 
         for j in range(k + 1, N):
             R[k, j] = 0.0
@@ -34,17 +34,17 @@ def gramschmidt_np(A, Q, R):
 
 def gramschmidt(concrete_type, m, n):
     def kernel_gramschmidt[
-        T: (float32, int32), M: int32, N: int32
+        T: (int32, int32), M: int32, N: int32
     ](A: "T[M, N]", Q: "T[M, N]", R: "T[N, N]"):
         for k in range(N):
-            nrm: T = 0.0
+            nrm: T = 0
             for i in range(M):
                 nrm += A[i, k] * A[i, k]
             # R[k, k] = allo.sqrt(nrm)
             R[k, k] = nrm
 
             for i in range(M):
-                Q[i, k] = A[i, k] / R[k, k]
+                Q[i, k] = int(A[i, k] / R[k, k])
 
             for j in range(k + 1, N):
                 R[k, j] = 0.0
@@ -69,9 +69,9 @@ def test_gramschmidt():
     # generate input data
     M = psize["gramschmidt"][test_psize]["M"]
     N = psize["gramschmidt"][test_psize]["N"]
-    A = np.random.randint(0, 10, size=(M, N)).astype(np.float32)
-    Q = np.zeros((N, N), dtype=np.float32)
-    R = np.zeros((N, N), dtype=np.float32)
+    A = np.random.randint(0, 10, size=(M, N)).astype(np.int32)
+    Q = np.zeros((N, N), dtype=np.int32)
+    R = np.zeros((N, N), dtype=np.int32)
 
     # run reference
     A_ref = A.copy()
@@ -83,7 +83,7 @@ def test_gramschmidt():
     A_opt = A.copy()
     Q_opt = Q.copy()
     R_opt = R.copy()
-    gramschmidt(float32, M, N)(A_opt, Q_opt, R_opt)
+    gramschmidt(int32, M, N)(A_opt, Q_opt, R_opt)
 
     # verify
     np.testing.assert_allclose(A_ref, A_opt, rtol=1e-3, atol=1e-3)

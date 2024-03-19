@@ -22,6 +22,7 @@ def cholesky_np(A):
         # i == j
         for k in range(i):
             A[i, i] = A[i, i] - A[i, k] * A[i, k]
+        print(A[i,i])
         A[i, i] = np.sqrt(A[i, i] * 1.0)
         # A[i, i] = math.isqrt(A[i, i] * 1)
 

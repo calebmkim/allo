@@ -21,7 +21,7 @@ def cholesky_np(A):
         # i == j
         for k in range(i):
             A[i, i] = int(A[i, i] - A[i, k] * A[i, k])
-        A[i, i] = int(np.sqrt(A[i, i] * 1.0))
+        A[i, i] = int(np.sqrt(A[i, i] * 1))
 
 
 def cholesky(concrete_type, n):

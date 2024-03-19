@@ -6,7 +6,7 @@ import json
 import pytest
 import allo
 import numpy as np
-from allo.ir.types import int32, float32
+from allo.ir.types import int32
 import allo.ir.types as T
 
 
@@ -28,9 +28,9 @@ def gemver_np(A, u1, u2, v1, v2, x, y, w, z, alpha, beta):
             w[i] = w[i] + alpha * A[i, j] * x[j]
 
 
-def gemver(concrete_type, n, alpha=0.1, beta=0.1):
+def gemver(concrete_type, n, alpha=10, beta=10):
     def kernel_gemver[
-        T: (float32, int32), N: int32
+        T: (int32, int32), N: int32
     ](
         A: "T[N, N]",
         u1: "T[N]",
@@ -66,21 +66,21 @@ def test_gemver():
     # for CI test we use small problem size
     test_psize = "small"
     N = psize["gemver"][test_psize]["N"]
-    concrete_type = float32
-    alpha = 0.1
-    beta = 0.1
+    concrete_type = int32
+    alpha = 10
+    beta = 10
     mod = gemver(concrete_type, N, alpha, beta)
 
     # generate input data
-    A = np.random.rand(N, N).astype(np.float32)
-    u1 = np.random.rand(N).astype(np.float32)
-    u2 = np.random.rand(N).astype(np.float32)
-    v1 = np.random.rand(N).astype(np.float32)
-    v2 = np.random.rand(N).astype(np.float32)
-    x = np.random.rand(N).astype(np.float32)
-    y = np.random.rand(N).astype(np.float32)
-    w = np.random.rand(N).astype(np.float32)
-    z = np.random.rand(N).astype(np.float32)
+    A = np.random.randint(1, 10, size=(N,N))
+    u1 = np.random.randint(1, 10, size=(N))
+    u2 = np.random.randint(1, 10, size=(N))
+    v1 = np.random.randint(1, 10, size=(N))
+    v2 = np.random.randint(1, 10, size=(N))
+    x = np.random.randint(1, 10, size=(N))
+    y = np.random.randint(1, 10, size=(N))
+    w = np.random.randint(1, 10, size=(N))
+    z = np.random.randint(1, 10, size=(N))
     A_golden = A.copy()
     y_golden = y.copy()
     x_golden = x.copy()

@@ -17,10 +17,10 @@ def durbin_np(r, y):
     beta = 1.0
     alpha = -r[0]
     for k in range(1, N):
-        beta = (1 - alpha * alpha) * beta
+        beta = np.multiply((1 - np.multiply(alpha,alpha)), beta)
         sum_ = 0
         for i in range(k):
-            sum_ = sum_ + r[k - i - 1] * y[i]
+            sum_ = sum_ + np.multiply(r[k - i - 1], y[i])
         alpha = -1 * (r[k] + sum_)
         # alpha = alpha / beta
         for i in range(k):
@@ -68,8 +68,8 @@ def test_durbin():
     test_psize = "mini"
     N = psize["durbin"][test_psize]["N"]
     concrete_type = int32
-    r = np.random.randint(1, 3, size=(N,))
-    y = np.random.randint(1, 3, size=(N,))
+    r = np.random.randint(1, 10, size=(N,))
+    y = np.random.randint(1, 10, size=(N,))
     y_golden = y.copy()
     durbin_np(r, y_golden)
     s = durbin(concrete_type, N)

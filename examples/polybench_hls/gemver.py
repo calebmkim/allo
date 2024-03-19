@@ -64,7 +64,7 @@ def test_gemver():
     with open(setting_path, "r") as fp:
         psize = json.load(fp)
     # for CI test we use small problem size
-    test_psize = "small"
+    test_psize = "mini"
     N = psize["gemver"][test_psize]["N"]
     concrete_type = int32
     alpha = 10

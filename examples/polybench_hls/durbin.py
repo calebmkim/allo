@@ -18,10 +18,10 @@ def durbin_np(r, y):
     alpha = -r[0]
     for k in range(1, N):
         beta = (1 - alpha * alpha) * beta
-        sum_ = 0.0
+        sum_ = 0
         for i in range(k):
             sum_ = sum_ + r[k - i - 1] * y[i]
-        alpha = -1.0 * (r[k] + sum_)
+        alpha = -1 * (r[k] + sum_)
         # alpha = alpha / beta
         for i in range(k):
             z[i] = y[i] + alpha * y[k - i - 1]
@@ -44,7 +44,7 @@ def durbin(concrete_type, n):
             for i in range(k):
                 sum_ = sum_ + r[k - i - 1] * y[i]
 
-            alpha = -1.0 * (r[k] + sum_)
+            alpha = -1 * (r[k] + sum_)
             # alpha = alpha / beta # unstable
 
             for i in range(k):
@@ -65,7 +65,7 @@ def test_durbin():
     with open(setting_path, "r") as fp:
         psize = json.load(fp)
     # for CI test we use small problem size
-    test_psize = "small"
+    test_psize = "mini"
     N = psize["durbin"][test_psize]["N"]
     concrete_type = int32
     r = np.random.randint(1, 10, size=(N,))

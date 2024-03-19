@@ -19,18 +19,17 @@ def durbin_np(r, y):
     beta = 1.0
     alpha = -r[0]
     for k in range(1, N):
-        beta = np.multiply((np.subtract(1, np.multiply(alpha,alpha))), beta)
-        sum_ = 0
+        beta = (1 - alpha * alpha) * beta
+        sum_ = 0.0
         for i in range(k):
-            sum_ = np.add(sum_,np.multiply(r[k - i - 1], y[i]))
-        alpha = np.multiply(-1, (np.add(r[k], sum_)))
+            sum_ = sum_ + r[k - i - 1] * y[i]
+        alpha = -1.0 * (r[k] + sum_)
         # alpha = alpha / beta
         for i in range(k):
-            z[i] = np.add(y[i], np.multiply(alpha, y[k - i - 1]))
+            z[i] = y[i] + alpha * y[k - i - 1]
         for i in range(k):
             y[i] = z[i]
         y[k] = alpha
-
 
 def durbin(concrete_type, n):
     def kernel_durbin[T: (int32, int32), N: int32](r: "T[N]", y: "T[N]"):

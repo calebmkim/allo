@@ -17,12 +17,13 @@ def cholesky_np(A):
         # j < i
         for j in range(i):
             for k in range(j):
-                A[i, j] = int(A[i, j] - A[i, k] * A[j, k])
-            A[i, j] = int(A[i, j] / A[j, j])
+                A[i, j] = A[i, j] - A[i, k] * A[j, k]
+            A[i, j] = A[i, j] / A[j, j]
         # i == j
         for k in range(i):
-            A[i, i] = int(A[i, i] - A[i, k] * A[i, k])
-        A[i, i] = math.isqrt(A[i, i] * 1)
+            A[i, i] = A[i, i] - A[i, k] * A[i, k]
+        A[i, i] = np.sqrt(A[i, i] * 1.0)
+        # A[i, i] = math.isqrt(A[i, i] * 1)
 
 
 def cholesky(concrete_type, n):

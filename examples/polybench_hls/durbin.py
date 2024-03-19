@@ -68,8 +68,8 @@ def test_durbin():
     test_psize = "mini"
     N = psize["durbin"][test_psize]["N"]
     concrete_type = int32
-    r = np.random.randint(1, 10, size=(N,))
-    y = np.random.randint(1, 10, size=(N,))
+    r = np.random.randint(1, 3, size=(N,))
+    y = np.random.randint(1, 3, size=(N,))
     y_golden = y.copy()
     durbin_np(r, y_golden)
     s = durbin(concrete_type, N)

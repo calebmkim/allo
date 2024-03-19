@@ -51,8 +51,8 @@ def test_doitgen():
     S = psize["doitgen"][test_psize]["S"]
 
     # generate input data
-    A = np.random.randint(100, size=(R, Q, S)).astype(int32)
-    x = np.random.randint(100, size=(P, S)).astype(int32)
+    A = np.random.randint(100, size=(R, Q, S)).astype(np.int32)
+    x = np.random.randint(100, size=(P, S)).astype(np.int32)
     sum_ = np.zeros(P).astype(np.int32)
     sum_ref = sum_.copy()
 

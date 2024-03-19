@@ -1,6 +1,7 @@
 # Copyright Allo authors. All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+import math
 import os
 import json
 import pytest
@@ -21,7 +22,7 @@ def cholesky_np(A):
         # i == j
         for k in range(i):
             A[i, i] = int(A[i, i] - A[i, k] * A[i, k])
-        A[i, i] = int(np.sqrt(A[i, i] * 1))
+        A[i, i] = math.isqrt(A[i, i] * 1)
 
 
 def cholesky(concrete_type, n):

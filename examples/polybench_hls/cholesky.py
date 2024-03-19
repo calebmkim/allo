@@ -21,8 +21,7 @@ def cholesky_np(A):
         # i == j
         for k in range(i):
             A[i, i] = A[i, i] - A[i, k] * A[i, k]
-        A[i, i] = A[i, i] * 1
-        # A[i, i] = np.sqrt(A[i, i] * 1.0)
+        A[i, i] = np.sqrt(A[i, i] * 1.0)
 
 
 def cholesky(concrete_type, n):
@@ -60,7 +59,7 @@ def test_cholesky():
 
     # run allo
     A_opt = A.copy()
-    s = cholesky(int32, N)
+    s = cholesky(float32, N)
     s(A_opt)
 
     # verify

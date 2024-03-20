@@ -68,7 +68,7 @@ def test_durbin():
     concrete_type = int32
     r = np.random.randint(1, 10, size=(N,)).astype(np.int32)
     y = np.random.randint(1, 10, size=(N,)).astype(np.int32)
-    y_golden = y.copy()
+    y_golden = y.copy().astype(np.int32)
     durbin_np(r, y_golden)
     s = durbin(concrete_type, N)
     mod = s.build()

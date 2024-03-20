@@ -74,7 +74,7 @@ def adi(ttype, TSTEPS, N):
     a = np.int32(-mul1 / 2.0)
     b = np.int32(1.0 + mul1)
     c = np.int32(a)
-    d = np.int32(-mul2 / 2.0)
+    d = int(-mul2 / 2.0)
     e = np.int32(1.0 + mul2)
     f = np.int32(d)
 

@@ -10,6 +10,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def bicg_np(A, s, q, p, r):
     N = A.shape[0]
@@ -61,7 +62,7 @@ def top_bicg(concrete_type, M, N):
     return sch
 
 
-def test_bicg():
+def test_bicg(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -72,8 +73,13 @@ def test_bicg():
     N = psize["bicg"][test_psize]["N"]
     concrete_type = int32
     sch = top_bicg(concrete_type, M, N)
+    if print_hls:
+        # printing hls instead
+        mod = s.build(target="vhls")
+        print(mod)
+        return
     mod = sch.build()
-    A =  np.random.randint(100, size=(N, M))
+    A =  np.random.randint(100, size=(N, M)).astype(np.int32)
     s = np.zeros(M).astype(np.int32)
     q = np.zeros(N).astype(np.int32)
     s_ref = np.zeros(M).astype(np.int32)
@@ -87,4 +93,7 @@ def test_bicg():
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_bicg(print_hls=True)
+    else:
+        pytest.main([__file__])

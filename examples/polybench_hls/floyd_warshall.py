@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def floyd_warshall_np(path):
     N = path.shape[0]
@@ -26,10 +27,10 @@ def floyd_warshall(concrete_type, N):
                 path[i, j] = path_
 
     s0 = allo.customize(kernel_floyd_warshall, instantiate=[concrete_type, N])
-    return s0.build()
+    return s0
 
 
-def test_floyd_warshall():
+def test_floyd_warshall(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -38,7 +39,13 @@ def test_floyd_warshall():
     test_psize = "small"
     N = psize["floyd_warshall"][test_psize]["N"]
     concrete_type = int32
-    mod = floyd_warshall(concrete_type, N)
+    s0 = floyd_warshall(concrete_type, N)
+    if print_hls:
+         # printing hls instead
+        mod = s0.build(target="vhls")
+        print(mod)
+        return
+    mod = s0.build()
     path = np.random.randint(1, 10, size=(N,N))
     path_ref = path.copy()
     floyd_warshall_np(path_ref)
@@ -47,4 +54,7 @@ def test_floyd_warshall():
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_floyd_warshall(print_hls=True)
+    else:
+        pytest.main([__file__])

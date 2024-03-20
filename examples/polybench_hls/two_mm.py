@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def two_mm_np(A, B, C, D, alpha, beta):
     out_AB = np.dot(A, B)
@@ -83,7 +84,7 @@ def two_mm(concrete_type, p, r, q, s):
     return sch
 
 
-def test_two_mm():
+def test_two_mm(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -100,27 +101,18 @@ def test_two_mm():
     C = np.random.rand(R, S).astype(dtype)
     D = np.random.rand(P, S).astype(dtype)
     sch = two_mm(int32, P, R, Q, S)
+    if print_hls:
+        # printing hls instead
+        mod = sch.build(target="vhls")
+        print(mod)
+        return
     mod = sch.build()
     output = mod(A, B, C, D)
     output_ref = two_mm_np(A, B, C, D, 1, 5)
     np.testing.assert_allclose(output, output_ref, rtol=1e-5, atol=1e-5)
 
-def print_two_mm():
-    """
-    Prints HLS implementation of two_mm
-    """
-    setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
-    with open(setting_path, "r") as fp:
-        psize = json.load(fp)
-    # for CI test we use small problem size
-    test_psize = "small"
-    P = psize["two_mm"][test_psize]["P"]
-    Q = psize["two_mm"][test_psize]["Q"]
-    R = psize["two_mm"][test_psize]["R"]
-    S = psize["two_mm"][test_psize]["S"]
-    sch = two_mm(int32, P, R, Q, S)
-    mod = sch.build(target="vhls")
-    print(mod)
-
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_two_mm(print_hls=True)
+    else:
+        pytest.main([__file__])

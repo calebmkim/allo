@@ -23,7 +23,7 @@ def durbin_np(r, y):
         alpha = -1.0 * (r[k] + sum_)
         # alpha = alpha / beta
         for i in range(k):
-            z[i] = y[i] + np.multiply(alpha, y[k - i - 1])
+            z[i] = y[i] + alpha * y[k - i - 1]
         for i in range(k):
             y[i] = z[i]
         y[k] = alpha

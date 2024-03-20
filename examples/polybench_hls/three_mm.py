@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def three_mm_np(A, B, C, D):
     out_AB = np.dot(A, B)
@@ -92,7 +93,7 @@ def three_mm(concrete_type, p, r, q, t, s):
     return sch
 
 
-def test_three_mm():
+def test_three_mm(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -107,15 +108,23 @@ def test_three_mm():
 
     concrete_type = int32
     sch = three_mm(concrete_type, P, R, Q, T, S)
+    if print_hls:
+        # printing hls instead
+        mod = sch.build(target="vhls")
+        print(mod)
+        return
     mod = sch.build()
-    A = np.random.randint(-10, 10, (P, Q))
-    B = np.random.randint(-10, 10, (Q, R))
-    C = np.random.randint(-10, 10, (R, S))
-    D = np.random.randint(-10, 10, (S, T))
+    A = np.random.randint(-10, 10, (P, Q)).astype(np.int32)
+    B = np.random.randint(-10, 10, (Q, R)).astype(np.int32)
+    C = np.random.randint(-10, 10, (R, S)).astype(np.int32)
+    D = np.random.randint(-10, 10, (S, T)).astype(np.int32)
     out = mod(A, B, C, D)
     out_ref = three_mm_np(A, B, C, D)
     np.testing.assert_allclose(out, out_ref, rtol=1e-5, atol=1e-5)
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_three_mm(print_hls=True)
+    else:
+        pytest.main([__file__])

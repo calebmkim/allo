@@ -69,7 +69,7 @@ def symm(concrete_type, M, N, alpha=15, beta=12):
     return sch
 
 
-def test_symm():
+def test_symm(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -81,17 +81,21 @@ def test_symm():
     alpha = 15
     beta = 12
     sch = symm(int32, M, N, alpha, beta)
+    if print_hls:
+        # printing hls instead
+        mod = sch.build(target="vhls")
+        print(mod)
+        return
     mod = sch.build()
     # functional testing
-    A = np.random.randint(10, size=(M, M))
-    B = np.random.randint(10, size=(M, N))
-    C = np.random.randint(10, size=(M, N))
+    A = np.random.randint(10, size=(M, M)).astype(np.int32)
+    B = np.random.randint(10, size=(M, N)).astype(np.int32)
+    C = np.random.randint(10, size=(M, N)).astype(np.int32)
     C_golden = C.copy()
     symm_np(A, B, C_golden, alpha, beta, M, N)
     mod = sch.build()
     mod(A.copy(), A.copy(), B.copy(), B.copy(), C)
     np.testing.assert_allclose(C, C_golden, rtol=1e-5, atol=1e-5)
-
 
 if __name__ == "__main__":
     pytest.main([__file__])

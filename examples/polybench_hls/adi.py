@@ -89,11 +89,11 @@ def adi(ttype, TSTEPS, N):
                 for j in range(1, N - 1):
                     p[i, j] = int(int(-c) / int(a * p[i, j - 1] + b))
                     q[i, j] = int(int(
-                        -d * u[j, i - 1]
+                        int(-d) * u[j, i - 1]
                         + (1 + 2 * d) * u[j, i]
-                        - f * u[j, i + 1]
-                        - a * q[i, j - 1]
-                    ) / int(a * p[i, j - 1] + b))
+                        - int(f) * u[j, i + 1]
+                        - int(a) * q[i, j - 1]
+                    ) / int(int(a) * p[i, j - 1] + int(b)))
 
                 v[N - 1, i] = int(1.0)
                 for j_rev in range(N - 1):

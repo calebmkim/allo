@@ -18,7 +18,7 @@ def trmm_np(A, B, alpha):
             B[i, j] *= alpha
 
 
-def top_trmm(concrete_type, m, n, alpha=1.5):
+def top_trmm(concrete_type, m, n, alpha=15):
     def S0[T: (int32, int32), M, N](A: "T[M, M]", B: "T[M, N]"):
         for i1, j1 in allo.grid(M, N, name="update"):
             for k1 in allo.reduction(M):
@@ -51,7 +51,7 @@ def top_trmm(concrete_type, m, n, alpha=1.5):
     return s
 
 
-def test_trmm():
+def test_trmm(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -61,12 +61,17 @@ def test_trmm():
     M = psize["trmm"][test_psize]["M"]
     N = psize["trmm"][test_psize]["N"]
     concrete_type = int32
-    alpha = 1.5
+    alpha = 15
     s = top_trmm(concrete_type, M, N, alpha)
-    A = np.random.randint(10, size=(M, M))
-    B = np.random.randint(10, size=(M, N))
+    A = np.random.randint(10, size=(M, M)).astype(np.int32)
+    B = np.random.randint(10, size=(M, N)).astype(np.int32)
     B_golden = B.copy()
     trmm_np(A, B_golden, alpha)
+    if print_hls:
+         # printing hls instead
+        mod = s.build(target="vhls")
+        print(mod)
+        return
     mod = s.build()
     mod(A, B)
     np.testing.assert_allclose(B, B_golden, atol=1e-4)

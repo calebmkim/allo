@@ -10,6 +10,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def seidel_2d_np(A, TSTEPS):
     for t in range(TSTEPS):
@@ -46,10 +47,10 @@ def seidel_2d(concrete_type, TSTEPS, N):
                     ) / 9)
 
     s = allo.customize(kernel_seidel_2d, instantiate=[concrete_type, TSTEPS, N])
-    return s.build()
+    return s
 
 
-def test_seidel_2d():
+def test_seidel_2d(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -59,7 +60,13 @@ def test_seidel_2d():
     TSTEPS = psize["seidel_2d"][test_psize]["TSTEPS"]
     N = psize["seidel_2d"][test_psize]["N"]
     concrete_type = int32
-    mod = seidel_2d(concrete_type, TSTEPS, N)
+    s = seidel_2d(concrete_type, TSTEPS, N)
+    if print_hls:
+        # printing hls instead
+        mod = s.build(target="vhls")
+        print(mod)
+        return
+    mod = s.build()
     # functional correctness test
     A = np.random.randint(10, size=(N, N))
     A_ref = A.copy()
@@ -69,4 +76,7 @@ def test_seidel_2d():
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_seidel_2d(print_hls=True)
+    else:
+        pytest.main([__file__])

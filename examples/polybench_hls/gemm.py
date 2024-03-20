@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def gemm_np(A, B, C, beta):
     out_AB = np.dot(A, B)
@@ -53,7 +54,7 @@ def gemm(concrete_type, p, r, q, beta=10):
     return sch
 
 
-def test_gemm():
+def test_gemm(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as f:
@@ -66,11 +67,16 @@ def test_gemm():
     beta = 10
     concrete_type = int32
     sch = gemm(concrete_type, P, R, Q, beta=beta)
+    if print_hls:
+        # printing hls instead
+        mod = sch.build(target="vhls")
+        print(mod)
+        return
     mod = sch.build()
     # functional correctness test
-    A = np.random.randint(1, 10, size=(P,Q))
-    B = np.random.randint(1, 10, size=(Q,R))
-    C = np.random.randint(1, 10, size=(P,R))
+    A = np.random.randint(1, 10, size=(P,Q)).astype(np.int32)
+    B = np.random.randint(1, 10, size=(Q,R)).astype(np.int32)
+    C = np.random.randint(1, 10, size=(P,R)).astype(np.int32)
     output = np.zeros((P, R)).astype(np.int32)
     output_ref = gemm_np(A, B, C, beta)
     mod = sch.build()
@@ -79,4 +85,7 @@ def test_gemm():
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_gemm(print_hls=True)
+    else:
+        pytest.main([__file__])

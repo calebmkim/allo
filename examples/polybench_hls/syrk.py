@@ -65,7 +65,7 @@ def syrk(concrete_type, M, N, alpha=15, beta=12):
     return sch
 
 
-def test_syrk():
+def test_syrk(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -82,6 +82,11 @@ def test_syrk():
     C = np.random.randint(0, 10, (N, N))
     C_golden = np.copy(C)
     syrk_np(A, C_golden, alpha, beta)
+    if print_hls:
+        # printing hls instead
+        mod = sch.build(target="vhls")
+        print(mod)
+        return
     mod = sch.build()
     mod(A.copy(), A.copy(), C.copy(), C)
     np.testing.assert_allclose(C, C_golden)

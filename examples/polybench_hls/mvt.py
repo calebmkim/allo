@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def mvt_np(A, x1, x2, y1, y2):
     N = A.shape[0]
@@ -68,7 +69,7 @@ def mvt(concrete_type, N):
     return sch
 
 
-def test_mvt():
+def test_mvt(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -78,11 +79,16 @@ def test_mvt():
     N = psize["mvt"][test_psize]["N"]
     concrete_type = int32
     sch = mvt(concrete_type, N)
+    if print_hls:
+        # printing hls instead
+        mod = sch.build(target="vhls")
+        print(mod)
+        return
     mod = sch.build()
     # functional correctness test
-    A = np.random.randint(100, size=(N, N))
-    x1 = np.random.randint(100, size=(N,))
-    x2 = np.random.randint(100, size=(N,))
+    A = np.random.randint(100, size=(N, N)).astype(np.int32)
+    x1 = np.random.randint(100, size=(N,)).astype(np.int32)
+    x2 = np.random.randint(100, size=(N,)).astype(np.int32)
     y1 = np.zeros(N).astype(np.int32)
     y2 = np.zeros(N).astype(np.int32)
 
@@ -98,4 +104,7 @@ def test_mvt():
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_mvt(print_hls=True)
+    else:
+        pytest.main([__file__])

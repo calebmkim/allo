@@ -87,13 +87,13 @@ def adi(ttype, TSTEPS, N):
                 p[i, 0] = 0
                 q[i, 0] = v[0, i]
                 for j in range(1, N - 1):
-                    p[i, j] = int(-c / (a * p[i, j - 1] + b))
+                    p[i, j] = int(-c / int(a * p[i, j - 1] + b))
                     q[i, j] = int((
-                        -d * u[j, i - 1]
-                        + (1 + 2 * d) * u[j, i]
-                        - f * u[j, i + 1]
-                        - a * q[i, j - 1]
-                    ) / (a * p[i, j - 1] + b))
+                        int(-d * u[j, i - 1])
+                        + int((1 + 2 * d) * u[j, i])
+                        - int(f * u[j, i + 1])
+                        - int(a * q[i, j - 1])
+                    ) / int(a * p[i, j - 1] + b))
 
                 v[N - 1, i] = int(1.0)
                 for j_rev in range(N - 1):
@@ -104,13 +104,13 @@ def adi(ttype, TSTEPS, N):
                 p[i, 0] = 0
                 q[i, 0] = u[i, 0]
                 for j in range(1, N - 1):
-                    p[i, j] = int(-f / (d * p[i, j - 1] + e))
-                    q[i, j] = int((
+                    p[i, j] = int(-f / int(d * p[i, j - 1] + e))
+                    q[i, j] = int(int(
                         -a * v[i - 1, j]
                         + (1 + 2 * a) * v[i, j]
                         - c * v[i + 1, j]
                         - d * q[i, j - 1]
-                    ) / (d * p[i, j - 1] + e))
+                    ) / int(d * p[i, j - 1] + e))
                 u[i, N - 1] = 1
                 for j_rev in range(N - 1):
                     j: index = N - 2 - j_rev

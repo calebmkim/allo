@@ -38,7 +38,7 @@ def doitgen(concrete_type, qq, rr, pp, ss):
     return s0
 
 
-def test_doitgen():
+def test_doitgen(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -65,6 +65,11 @@ def test_doitgen():
     A_opt = A.copy()
     x_opt = x.copy()
     s0 =  doitgen(int32, Q, R, P, S)
+    if print_hls:
+        # printing hls instead
+        mod = s0.build(target="vhls")
+        print(mod)
+        return
     mod = s0.build()
     mod(A_opt, x_opt, sum_)
 

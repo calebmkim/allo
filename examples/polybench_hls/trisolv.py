@@ -43,8 +43,8 @@ def test_trisolv():
 
     # generate input data
     N = psize["trisolv"][test_psize]["N"]
-    L = np.random.randint(1, 10, size=(N, N))
-    b = np.random.randint(1, 10, size=(N,))
+    L = np.random.randint(1, 10, size=(N, N)).astype(np.int32)
+    b = np.random.randint(1, 10, size=(N,)).astype(np.int32)
 
     # run reference
     x_ref = np.zeros_like(b)

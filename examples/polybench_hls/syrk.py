@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def syrk_np(A, C, alpha, beta):
     for i in range(A.shape[0]):
@@ -93,4 +94,7 @@ def test_syrk(print_hls=False):
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_syrk(print_hls=True)
+    else:
+        pytest.main([__file__])

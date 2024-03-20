@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def gesummv_np(A, B, x, y, alpha, beta):
     tmp = np.zeros_like(y)
@@ -64,7 +65,7 @@ def gesummv(concrete_type, N, alpha=10, beta=10):
     return sch
 
 
-def test_gesummv():
+def test_gesummv(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -74,18 +75,26 @@ def test_gesummv():
     N = psize["gesummv"][test_psize]["N"]
     concrete_type = int32
     # functional correctness test
-    A = np.random.randint(1, 10, size=(N,N))
-    B = np.random.randint(1, 10, size=(N,N))
-    x = np.random.randint(1, 10, size=(N))
+    A = np.random.randint(1, 10, size=(N,N)).astype(np.int32)
+    B = np.random.randint(1, 10, size=(N,N)).astype(np.int32)
+    x = np.random.randint(1, 10, size=(N)).astype(np.int32)
     y = np.zeros(N).astype(np.int32)
     y_ref = np.zeros(N).astype(np.int32)
     alpha, beta = 10, 10
     gesummv_np(A, B, x, y_ref, alpha, beta)
     sch = gesummv(concrete_type, N, alpha, beta)
+    if print_hls:
+        # printing hls instead
+        mod = sch.build(target="vhls")
+        print(mod)
+        return
     mod = sch.build()
     mod(A, B, x, y)
     np.testing.assert_allclose(y, y_ref, rtol=1e-5, atol=1e-5)
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_gesummv(print_hls=True)
+    else:
+        pytest.main([__file__])

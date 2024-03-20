@@ -71,12 +71,12 @@ def adi(ttype, TSTEPS, N):
     mul1 = B1 * DT / (DX * DX)
     mul2 = B2 * DT / (DY * DY)
 
-    a = np.int32(-mul1 / 2.0)
-    b = np.int32(1.0 + mul1)
-    c = np.int32(a)
-    d = np.int32(-mul2 / 2.0)
-    e = np.int32(1.0 + mul2)
-    f = np.int32(d)
+    a = int(-mul1 / 2.0)
+    b = int(1.0 + mul1)
+    c = int(a)
+    d = int(-mul2 / 2.0)
+    e = int(1.0 + mul2)
+    f = int(d)
 
     def kernel_adi[
         T: (int32, int32), TSTEPS: int32, N: int32

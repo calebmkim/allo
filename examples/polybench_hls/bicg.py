@@ -75,7 +75,7 @@ def test_bicg(print_hls=False):
     sch = top_bicg(concrete_type, M, N)
     if print_hls:
         # printing hls instead
-        mod = s.build(target="vhls")
+        mod = sch.build(target="vhls")
         print(mod)
         return
     mod = sch.build()

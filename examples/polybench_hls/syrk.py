@@ -79,8 +79,8 @@ def test_syrk(print_hls=False):
     alpha = 15
     beta = 12
     sch = syrk(concrete_type, M, N, alpha, beta)
-    A = np.random.randint(0, 10, (N, M))
-    C = np.random.randint(0, 10, (N, N))
+    A = np.random.randint(0, 10, (N, M)).astype(np.int32)
+    C = np.random.randint(0, 10, (N, N)).astype(np.int32)
     C_golden = np.copy(C)
     syrk_np(A, C_golden, alpha, beta)
     if print_hls:

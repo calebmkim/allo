@@ -30,10 +30,10 @@ def trisolv(concrete_type, n):
             x[i] = int(x[i] / L[i, i])
 
     s0 = allo.customize(kernel_trisolv, instantiate=[concrete_type, n])
-    return s0.build()
+    return s0
 
 
-def test_trisolv():
+def test_trisolv(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -52,8 +52,14 @@ def test_trisolv():
 
     # run allo
     x = np.zeros_like(b)
-    s = trisolv(int32, N)
-    s(L, b, x)
+    s0 = trisolv(int32, N)
+    if print_hls:
+        # printing hls instead
+        mod = s0.build(target="vhls")
+        print(mod)
+        return
+    mod = s0.build()
+    mod(L, b, x)
 
     # verify
     np.testing.assert_allclose(x, x_ref, rtol=1e-5, atol=1e-5)

@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def syr2k_np(A, B, C, alpha, beta):
     for i in range(A.shape[0]):
@@ -83,7 +84,7 @@ def syr2k(concrete_type, M, N, alpha=15, beta=12):
     return sch
 
 
-def test_syr2k():
+def test_syr2k(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -96,15 +97,23 @@ def test_syr2k():
     alpha = 15
     beta = 12
     sch = syr2k(concrete_type, M, N, alpha, beta)
-    A = np.random.randint(0, 10, (N, M))
-    B = np.random.randint(0, 10, (N, M))
-    C = np.random.randint(0, 10, (N, N))
+    A = np.random.randint(0, 10, (N, M)).astype(np.int32)
+    B = np.random.randint(0, 10, (N, M)).astype(np.int32)
+    C = np.random.randint(0, 10, (N, N)).astype(np.int32)
     C_golden = np.copy(C)
     syr2k_np(A, B, C_golden, alpha, beta)
+    if print_hls:
+        # printing hls instead
+        mod = sch.build(target="vhls")
+        print(mod)
+        return
     mod = sch.build()
     mod(A.copy(), A.copy(), B.copy(), B.copy(), C.copy(), C)
     np.testing.assert_allclose(C, C_golden)
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_syr2k(print_hls=True)
+    else:
+        pytest.main([__file__])

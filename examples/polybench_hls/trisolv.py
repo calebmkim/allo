@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def trisolv_np(L, x, b):
     N = L.shape[0]
@@ -66,4 +67,7 @@ def test_trisolv(print_hls=False):
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_trisolv(print_hls=True)
+    else:
+        pytest.main([__file__])

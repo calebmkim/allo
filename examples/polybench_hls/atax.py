@@ -9,6 +9,8 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
+
 
 def atax_np(A, x):
     out_Ax = np.dot(A, x)
@@ -55,7 +57,7 @@ def atax(concrete_type, m, n):
     return sch
 
 
-def test_atax():
+def test_atax(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -66,6 +68,11 @@ def test_atax():
     N = psize["atax"][test_psize]["N"]
     concrete_type = int32
     sch = atax(concrete_type, M, N)
+    if print_hls:
+        # printing hls instead
+        mod = sch.build(target="vhls")
+        print(mod)
+        return
     mod = sch.build()
     A = np.random.randint(100, size=(M, N))
     x = np.random.randint(100, size=N)
@@ -74,19 +81,11 @@ def test_atax():
     mod(A, x, y)
     assert np.allclose(y, y_ref, atol=1e-5, rtol=1e-3)
 
-def print_atax():
-    """Prints HLS code for atax"""
-    setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
-    with open(setting_path, "r") as fp:
-        psize = json.load(fp)
-    # for CI test we use small problem size
-    test_psize = "small"
-    M = psize["atax"][test_psize]["M"]
-    N = psize["atax"][test_psize]["N"]
-    concrete_type = int32
-    sch = atax(concrete_type, M, N)
-    mod = sch.build(target="vhls")
-    print(mod)
-
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_atax(print_hls=True)
+    else:
+        pytest.main([__file__])
+
+
+

@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def symm_np(A, B, C, alpha, beta, M, N):
     for i in range(M):
@@ -98,4 +99,7 @@ def test_symm(print_hls=False):
     np.testing.assert_allclose(C, C_golden, rtol=1e-5, atol=1e-5)
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_symm(print_hls=True)
+    else:
+        pytest.main([__file__])

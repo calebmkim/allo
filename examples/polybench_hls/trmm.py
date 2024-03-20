@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def trmm_np(A, B, alpha):
     for i in range(A.shape[0]):
@@ -78,4 +79,7 @@ def test_trmm(print_hls=False):
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_trmm(print_hls=True)
+    else:
+        pytest.main([__file__])

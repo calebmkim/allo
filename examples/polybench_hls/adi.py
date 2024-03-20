@@ -9,6 +9,8 @@ import numpy as np
 import allo.ir.types as T
 from allo.ir.types import int32, index
 
+import sys
+
 
 def adi_np(u, v, p, q, TSTEPS, N):
     DX = 1.0 / N
@@ -115,11 +117,10 @@ def adi(ttype, TSTEPS, N):
                     u[i, j] = int(p[i, j] * u[i, j + 1] + q[i, j])
 
     s = allo.customize(kernel_adi, instantiate=[ttype, TSTEPS, N])
-    mod = s.build()
-    return mod
+    return s
 
 
-def test_adi():
+def test_adi(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -130,10 +131,10 @@ def test_adi():
     TSTEPS = psize["adi"][test_psize]["TSTEPS"]
     N = psize["adi"][test_psize]["N"]
 
-    u = np.random.randint(0, 100, (N, N))
-    v = np.random.randint(0, 100, (N, N))
-    p = np.random.randint(0, 100, (N, N))
-    q = np.random.randint(0, 100, (N, N))
+    u = np.random.randint(0, 100, (N, N)).astype(int32)
+    v = np.random.randint(0, 100, (N, N)).astype(int32)
+    p = np.random.randint(0, 100, (N, N)).astype(int32)
+    q = np.random.randint(0, 100, (N, N)).astype(int32)
 
     u_ref = u.copy()
     v_ref = v.copy()
@@ -142,7 +143,13 @@ def test_adi():
 
     adi_np(u_ref, v_ref, p_ref, q_ref, TSTEPS, N)
 
-    mod = adi(int32, TSTEPS, N)
+    s = adi(int32, TSTEPS, N)
+    if print_hls:
+        # printing hls instead
+        mod = s.build(target="vhls")
+        print(mod)
+        return
+    mod = s.build()
     mod(u, v, p, q)
 
     np.testing.assert_allclose(u, u_ref, rtol=1e-5, atol=1e-5)
@@ -152,4 +159,7 @@ def test_adi():
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_adi(print_hls=True)
+    else:
+        pytest.main([__file__])

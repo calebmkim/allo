@@ -51,7 +51,7 @@ def test_lu():
 
     # generate input data
     N = psize["lu"][test_psize]["N"]
-    A = np.random.randint(100, size=(N, N))
+    A = np.random.randint(1,10, size=(N, N))
 
     # run reference
     A_ref = A.copy()

@@ -8,12 +8,9 @@ import allo
 import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
-import ctypes
-Int32 = ctypes.c_int32
-
 
 def durbin_np(r, y):
-    z = np.zeros_like(y).astype(Int32)
+    z = np.zeros_like(y).astype(np.int32)
     N = r.shape[0]
     y[0] = -r[0]
     beta = 1.0
@@ -69,8 +66,8 @@ def test_durbin():
     test_psize = "mini"
     N = psize["durbin"][test_psize]["N"]
     concrete_type = int32
-    r = np.random.randint(1, 10, size=(N,)).astype(Int32)
-    y = np.random.randint(1, 10, size=(N,)).astype(Int32)
+    r = np.random.randint(1, 10, size=(N,)).astype(np.int32)
+    y = np.random.randint(1, 10, size=(N,)).astype(np.int32)
     y_golden = y.copy()
     durbin_np(r, y_golden)
     s = durbin(concrete_type, N)

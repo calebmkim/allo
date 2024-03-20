@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32
 import allo.ir.types as T
 
+import sys
 
 def doitgen_np(A, x, sum):
     NR, NQ, NP = A.shape
@@ -78,4 +79,7 @@ def test_doitgen(print_hls=False):
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_doitgen(print_hls=True)
+    else:
+        pytest.main([__file__])

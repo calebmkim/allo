@@ -46,7 +46,7 @@ def test_floyd_warshall(print_hls=False):
         print(mod)
         return
     mod = s0.build()
-    path = np.random.randint(1, 10, size=(N,N))
+    path = np.random.randint(1, 10, size=(N,N)).astype(np.int32)
     path_ref = path.copy()
     floyd_warshall_np(path_ref)
     mod(path)

@@ -71,7 +71,7 @@ def adi(ttype, TSTEPS, N):
     mul1 = B1 * DT / (DX * DX)
     mul2 = B2 * DT / (DY * DY)
 
-    a = int(-mul1 / 2.0)
+    a = np.int32(-mul1 / 2.0)
     b = int(1.0 + mul1)
     c = int(a)
     d = int(-mul2 / 2.0)

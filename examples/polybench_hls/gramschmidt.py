@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32, float32
 import allo.ir.types as T
 
+import sys
 
 def gramschmidt_np(A, Q, R):
     M = A.shape[0]
@@ -55,10 +56,10 @@ def gramschmidt(concrete_type, m, n):
                     A[i, j] -= Q[i, k] * R[k, j]
 
     s0 = allo.customize(kernel_gramschmidt, instantiate=[concrete_type, m, n])
-    return s0.build()
+    return s0
 
 
-def test_gramschmidt():
+def test_gramschmidt(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -83,7 +84,14 @@ def test_gramschmidt():
     A_opt = A.copy()
     Q_opt = Q.copy()
     R_opt = R.copy()
-    gramschmidt(int32, M, N)(A_opt, Q_opt, R_opt)
+    s0 = gramschmidt(int32, M, N)
+    if print_hls:
+        # printing hls instead
+        mod = s0.build(target="vhls")
+        print(mod)
+        return
+    mod = s0.build()
+    mod(A_opt, Q_opt, R_opt)
 
     # verify
     np.testing.assert_allclose(A_ref, A_opt, rtol=1e-3, atol=1e-3)
@@ -92,4 +100,7 @@ def test_gramschmidt():
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_gramschmidt(print_hls=True)
+    else:
+        pytest.main([__file__])

@@ -71,12 +71,12 @@ def adi(ttype, TSTEPS, N):
     mul1 = B1 * DT / (DX * DX)
     mul2 = B2 * DT / (DY * DY)
 
-    a = int(-mul1 / 2.0)
-    b = int(1.0 + mul1)
-    c = int(a)
-    d = int(-mul2 / 2.0)
-    e = int(1.0 + mul2)
-    f = int(d)
+    a = np.int32(-mul1 / 2.0)
+    b = np.int32(1.0 + mul1)
+    c = np.int32(a)
+    d = np.int32(-mul2 / 2.0)
+    e = np.int32(1.0 + mul2)
+    f = np.int32(d)
 
     def kernel_adi[
         T: (int32, int32), TSTEPS: int32, N: int32
@@ -87,15 +87,15 @@ def adi(ttype, TSTEPS, N):
                 p[i, 0] = 0
                 q[i, 0] = v[0, i]
                 for j in range(1, N - 1):
-                    p[i, j] = int(-c / int(a * p[i, j - 1] + b))
-                    q[i, j] = int((
-                        int(-d * u[j, i - 1])
-                        + int((1 + 2 * d) * u[j, i])
-                        - int(f * u[j, i + 1])
-                        - int(a * q[i, j - 1])
-                    ) / int(a * p[i, j - 1] + b))
+                    p[i, j] = np.int32(-c / (a * p[i, j - 1] + b))
+                    q[i, j] = np.int32((
+                        (-d * u[j, i - 1])
+                        + ((1 + 2 * d) * u[j, i])
+                        - (f * u[j, i + 1])
+                        - (a * q[i, j - 1])
+                    ) / (a * p[i, j - 1] + b))
 
-                v[N - 1, i] = int(1.0)
+                v[N - 1, i] = np.int32(1.0)
                 for j_rev in range(N - 1):
                     j: index = N - 2 - j_rev
                     v[j, i] = int(p[i, j] * v[j + 1, i] + q[i, j])
@@ -104,17 +104,17 @@ def adi(ttype, TSTEPS, N):
                 p[i, 0] = 0
                 q[i, 0] = u[i, 0]
                 for j in range(1, N - 1):
-                    p[i, j] = int(-f / int(d * p[i, j - 1] + e))
-                    q[i, j] = int(int(
+                    p[i, j] = np.int32(-f / int(d * p[i, j - 1] + e))
+                    q[i, j] = np.int32((
                         -a * v[i - 1, j]
                         + (1 + 2 * a) * v[i, j]
                         - c * v[i + 1, j]
                         - d * q[i, j - 1]
-                    ) / int(d * p[i, j - 1] + e))
+                    ) / (d * p[i, j - 1] + e))
                 u[i, N - 1] = 1
                 for j_rev in range(N - 1):
                     j: index = N - 2 - j_rev
-                    u[i, j] = int(p[i, j] * u[i, j + 1] + q[i, j])
+                    u[i, j] = np.int32(p[i, j] * u[i, j + 1] + q[i, j])
 
     s = allo.customize(kernel_adi, instantiate=[ttype, TSTEPS, N])
     return s

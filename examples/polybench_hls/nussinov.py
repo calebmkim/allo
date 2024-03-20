@@ -9,6 +9,7 @@ import numpy as np
 from allo.ir.types import int32, index
 import allo.ir.types as T
 
+import sys
 
 def MATCH(b1, b2):
     if b1 + b2 == 3:
@@ -74,10 +75,9 @@ def nussinov(concrete_type, n):
                         table[i, j] = s3
 
     s = allo.customize(kernel_nussinov, instantiate=[concrete_type, n])
-    return s.build()
+    return s
 
-
-def test_nussinov():
+def test_nussinov(print_hls=False):
     # read problem size settings
     setting_path = os.path.join(os.path.dirname(__file__), "psize.json")
     with open(setting_path, "r") as fp:
@@ -86,9 +86,15 @@ def test_nussinov():
     test_psize = "small"
     N = psize["nussinov"][test_psize]["N"]
     concrete_type = int32
-    mod = nussinov(concrete_type, N)
+    s = nussinov(concrete_type, N)
+    if print_hls:
+        # printing hls instead
+        mod = s.build(target="vhls")
+        print(mod)
+        return
+    mod = s.build()
 
-    seq = np.random.randint(0, 4, size=N)
+    seq = np.random.randint(0, 4, size=N).astype(np.int32)
     table = np.zeros((N, N), dtype=np.int32)
     table_ref = table.copy()
     nussinov_np(seq, table_ref)
@@ -97,4 +103,7 @@ def test_nussinov():
 
 
 if __name__ == "__main__":
-    pytest.main([__file__])
+    if "-hls" in sys.argv:
+        test_nussinov(print_hls=True)
+    else:
+        pytest.main([__file__])

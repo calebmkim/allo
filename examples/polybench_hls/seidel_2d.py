@@ -68,7 +68,7 @@ def test_seidel_2d(print_hls=False):
         return
     mod = s.build()
     # functional correctness test
-    A = np.random.randint(10, size=(N, N))
+    A = np.random.randint(10, size=(N, N)).astype(np.int32)
     A_ref = A.copy()
     mod(A)
     seidel_2d_np(A_ref, TSTEPS)

@@ -74,8 +74,8 @@ def test_atax(print_hls=False):
         print(mod)
         return
     mod = sch.build()
-    A = np.random.randint(100, size=(M, N))
-    x = np.random.randint(100, size=N)
+    A = np.random.randint(100, size=(M, N)).astype(np.int32)
+    x = np.random.randint(100, size=N).astype(np.int32)
     y = np.zeros((N,), dtype=np.int32)
     y_ref = atax_np(A, x)
     mod(A, x, y)

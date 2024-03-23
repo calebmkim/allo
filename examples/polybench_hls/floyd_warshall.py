@@ -17,7 +17,7 @@ def floyd_warshall_np(path):
     for k in range(N):
         for i in range(N):
             for j in range(N):
-                path[i, j] = min(path[i, j], path[i, k] + path[k, j]) + 1
+                path[i, j] = min(path[i, j], path[i, k] + path[k, j])
 
 
 def floyd_warshall(concrete_type, N):

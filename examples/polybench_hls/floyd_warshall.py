@@ -11,7 +11,6 @@ import allo.ir.types as T
 
 import sys
 
-
 def floyd_warshall_np(path):
     N = path.shape[0]
     for k in range(N):
@@ -21,13 +20,13 @@ def floyd_warshall_np(path):
 
 
 def floyd_warshall(concrete_type, N):
-    def kernel_floyd_warshall(path: int32[N, N]):
+    def kernel_floyd_warshall[T: (int32, int32), N: int32](path: "T[N, N]"):
         for k, i, j in allo.grid(N, N, N):
-            path_: int32 = path[i, k] + path[k, j]
+            path_: T = path[i, k] + path[k, j]
             if path[i, j] >= path_:
                 path[i, j] = path_
 
-    s0 = allo.customize(kernel_floyd_warshall)
+    s0 = allo.customize(kernel_floyd_warshall, instantiate=[concrete_type, N])
     return s0
 
 
@@ -42,12 +41,12 @@ def test_floyd_warshall(print_hls=False):
     concrete_type = int32
     s0 = floyd_warshall(concrete_type, N)
     if print_hls:
-        # printing hls instead
+         # printing hls instead
         mod = s0.build(target="vhls")
         print(mod)
         return
     mod = s0.build()
-    path = np.random.randint(1, 10, size=(N, N)).astype(np.int32)
+    path = np.random.randint(1, 10, size=(N,N)).astype(np.int32)
     path_ref = path.copy()
     floyd_warshall_np(path_ref)
     mod(path)

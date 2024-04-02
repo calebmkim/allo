@@ -111,6 +111,7 @@ def test_subview_systolic_stream():
     s.to(s.A_fifo, pe, axis=1, depth=M + 1)
     s.to(s.B_fifo, pe, axis=0, depth=N + 1)
     code = s.build("vhls")
+    print(code)
     assert "#pragma HLS dataflow" in str(code)
     if hls.is_available():
         hls_mod = s.build(

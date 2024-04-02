@@ -64,27 +64,27 @@ def test_subview_systolic():
 
 
 def test_subview_systolic_stream():
-    M, N, K = 2, 2, 2
+    M, N, K = 16, 16, 16
 
     def kernel(
-        A_in: int8[K],
-        B_in: int8[K],
-        A_out: int8[K],
-        B_out: int8[K],
-        C: int16[M, N],
+        A_in: int32[K],
+        B_in: int32[K],
+        A_out: int32[K],
+        B_out: int32[K],
+        C: int32[M, N],
         i: index,
         j: index,
     ):
         for k in range(K):
-            a: int8 = A_in[k]
-            b: int8 = B_in[k]
+            a: int32 = A_in[k]
+            b: int32 = B_in[k]
             C[i, j] += a * b
             A_out[k] = a
             B_out[k] = b
 
-    def systolic_array(A: int8[M, K], B: int8[K, N], C: int16[M, N]):
-        A_fifo: int8[M, N + 1, K]
-        B_fifo: int8[N, M + 1, K]
+    def systolic_array(A: int32[M, K], B: int32[K, N], C: int32[M, N]):
+        A_fifo: int32[M, N + 1, K]
+        B_fifo: int32[N, M + 1, K]
 
         for k in range(K, name="data_load"):
             for m in range(M):
@@ -95,8 +95,8 @@ def test_subview_systolic_stream():
             kernel(
                 A_fifo[i, j], B_fifo[j, i], A_fifo[i, j + 1], B_fifo[j, i + 1], C, i, j
             )
-        A_drain: int8[M]
-        B_drain: int8[N]
+        A_drain: int32[M]
+        B_drain: int32[N]
         for k in range(K, name="data_drain"):
             for m in range(M):
                 A_drain[m] = A_fifo[m, N, k]

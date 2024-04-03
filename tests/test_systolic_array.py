@@ -85,10 +85,9 @@ def test_subview_systolic_stream():
             B_out[k] = b
 
     # def systolic_array(A: int32[M, K], B: int32[K, N], C: int32[M, N]):
-    def systolic_array(C: int32[M, N]):
-        A_fifo: int32[M, N + 1, K]
-        B_fifo: int32[N, M + 1, K]
-
+    def systolic_array(
+        A_fifo: int32[M, N + 1, K], B_fifo: int32[N, M + 1, K], C: int32[M, N]
+    ):
         # for k in range(K, name="data_load"):
         #     for m in range(M):
         #         A_fifo[m, 0, k] = A[m, k]

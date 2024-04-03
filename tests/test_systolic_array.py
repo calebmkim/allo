@@ -109,11 +109,10 @@ def test_subview_systolic_stream():
             for n in range(N):
                 B_fifo[n, 0, k] = B[k, n]
 
-        systolic_computation(A_fifo, B_fifo, C)
-        # for i, j in allo.grid(M, N, name="PE"):
-        #     kernel(
-        #         A_fifo[i, j], B_fifo[j, i], A_fifo[i, j + 1], B_fifo[j, i + 1], C, i, j
-        #     )
+        for i, j in allo.grid(M, N, name="PE"):
+            kernel(
+                A_fifo[i, j], B_fifo[j, i], A_fifo[i, j + 1], B_fifo[j, i + 1], C, i, j
+            )
 
         A_drain: int32[M]
         B_drain: int32[N]
@@ -123,15 +122,15 @@ def test_subview_systolic_stream():
             for n in range(N):
                 B_drain[n] = B_fifo[n, M, k]
 
+    s = allo.customize(systolic_array)
+    s.partition(s.A, dim=1)
+    s.partition(s.B, dim=2)
+
     s0 = allo.customize(systolic_computation)
     pe = s0.unfold("PE", [0, 1])  # specify which are spatial loops
     s0.partition(s0.C, dim=0)  # required, otherwise it will fail dataflow checking
     s0.to(s0.A_fifo, pe, axis=1, depth=M + 1)
     s0.to(s0.B_fifo, pe, axis=0, depth=N + 1)
-
-    s = allo.customize(systolic_array)
-    s.partition(s.A, dim=1)
-    s.partition(s.B, dim=2)
 
     s.compose(s0)
 

@@ -109,10 +109,11 @@ def test_subview_systolic_stream():
             for n in range(N):
                 B_fifo[n, 0, k] = B[k, n]
 
-        for i, j in allo.grid(M, N, name="PE"):
-            kernel(
-                A_fifo[i, j], B_fifo[j, i], A_fifo[i, j + 1], B_fifo[j, i + 1], C, i, j
-            )
+        systolic_computation(A_fifo, B_fifo, C)
+        # for i, j in allo.grid(M, N, name="PE"):
+        #     kernel(
+        #         A_fifo[i, j], B_fifo[j, i], A_fifo[i, j + 1], B_fifo[j, i + 1], C, i, j
+        #     )
 
         A_drain: int32[M]
         B_drain: int32[N]

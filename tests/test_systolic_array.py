@@ -30,15 +30,6 @@ def test_subview_systolic():
             A_out[k] = a
             B_out[k] = b
 
-    def systolic_computation(
-        A_fifo: int32[M, N + 1, K], B_fifo: int32[N, M + 1, K], C: int32[M, N]
-    ):
-        """Just the Computation"""
-        for i, j in allo.grid(M, N, name="PE"):
-            kernel(
-                A_fifo[i, j], B_fifo[j, i], A_fifo[i, j + 1], B_fifo[j, i + 1], C, i, j
-            )
-
     def systolic_array(A: int32[M, K], B: int32[K, N], C: int32[M, N]):
         A_fifo: int32[M, N + 1, K]
         B_fifo: int32[N, M + 1, K]
@@ -49,7 +40,10 @@ def test_subview_systolic():
             for n in range(N):
                 B_fifo[n, 0, k] = B[k, n]
 
-        systolic_computation(A_fifo, B_fifo, C)
+        for i, j in allo.grid(M, N, name="PE"):
+            kernel(
+                A_fifo[i, j], B_fifo[j, i], A_fifo[i, j + 1], B_fifo[j, i + 1], C, i, j
+            )
 
         A_drain: int32[M]
         B_drain: int32[N]

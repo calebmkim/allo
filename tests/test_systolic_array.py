@@ -110,8 +110,8 @@ def test_subview_systolic_stream():
 
     s = allo.customize(systolic_array)
     s.partition(s.C, dim=0)  # required, otherwise it will fail dataflow checking
-    s.partition(s.A, dim=1)
-    s.partition(s.B, dim=2)
+    # s.partition(s.A, dim=1)
+    # s.partition(s.B, dim=2)
     pe = s.unfold("PE", [0, 1])  # specify which are spatial loops
     s.to(s.A_fifo, pe, axis=1, depth=M + 1)
     s.to(s.B_fifo, pe, axis=0, depth=N + 1)

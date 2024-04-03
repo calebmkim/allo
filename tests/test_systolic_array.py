@@ -126,8 +126,8 @@ def test_subview_systolic_stream():
     s.partition(s.A, dim=1)
     s.partition(s.B, dim=2)
     pe = s0.unfold("PE", [0, 1])  # specify which are spatial loops
-    s.to(s.A_fifo, pe, axis=1, depth=M + 1)
-    s.to(s.B_fifo, pe, axis=0, depth=N + 1)
+    s0.to(s0.A_fifo, pe, axis=1, depth=M + 1)
+    s0.to(s0.B_fifo, pe, axis=0, depth=N + 1)
 
     s.compose(s0)
 

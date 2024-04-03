@@ -88,24 +88,24 @@ def test_subview_systolic_stream():
         A_fifo: int32[M, N + 1, K]
         B_fifo: int32[N, M + 1, K]
 
-        for k in range(K, name="data_load"):
-            for m in range(M):
-                A_fifo[m, 0, k] = A[m, k]
-            for n in range(N):
-                B_fifo[n, 0, k] = B[k, n]
+        # for k in range(K, name="data_load"):
+        #     for m in range(M):
+        #         A_fifo[m, 0, k] = A[m, k]
+        #     for n in range(N):
+        #         B_fifo[n, 0, k] = B[k, n]
 
         for i, j in allo.grid(M, N, name="PE"):
             kernel(
                 A_fifo[i, j], B_fifo[j, i], A_fifo[i, j + 1], B_fifo[j, i + 1], C, i, j
             )
 
-        A_drain: int32[M]
-        B_drain: int32[N]
-        for k in range(K, name="data_drain"):
-            for m in range(M):
-                A_drain[m] = A_fifo[m, N, k]
-            for n in range(N):
-                B_drain[n] = B_fifo[n, M, k]
+        # A_drain: int32[M]
+        # B_drain: int32[N]
+        # for k in range(K, name="data_drain"):
+        #     for m in range(M):
+        #         A_drain[m] = A_fifo[m, N, k]
+        #     for n in range(N):
+        #         B_drain[n] = B_fifo[n, M, k]
 
     s = allo.customize(systolic_array)
     s.partition(s.C, dim=0)  # required, otherwise it will fail dataflow checking
